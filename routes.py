@@ -10,7 +10,8 @@ secure_scheme = 'https'
 
 _routes = [
     RedirectRoute('/secure/', handlers.SecureRequestHandler, name='secure', strict_slash=True),
-    RedirectRoute('/dummy/', handlers.DummyHandler, name='dummy', strict_slash=True)
+    RedirectRoute('/story/', handlers.StoryHandler, name='story', strict_slash=True),
+    RedirectRoute('/trip/', handlers.TripHandler, name='trip', strict_slash=True),
 ]
 
 def get_routes():

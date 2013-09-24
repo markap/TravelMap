@@ -17,7 +17,7 @@ config = {
                               'environment_args': {'extensions': ['jinja2.ext.i18n']}},
 
     # application name
-    'app_name': "Travel Map",
+    'app_name': "Tripstory",
 
     # the default language code for the application.
     # should match whatever language the site uses when i18n is disabled
