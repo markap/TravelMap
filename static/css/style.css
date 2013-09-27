@@ -11,4 +11,15 @@ dt,dd {
   padding-top: 5px;
   margin-bottom: 10px;;
 }
-.home_bp{background:transparent url(../img/logo.png) top center no-repeat;padding-top:20em;text-align:center}.home_bp h1{font-size:1.6em}.home_bp p{font-size:1.2em}
+
+/* Main marketing message and sign up button */
+.home_bp {
+  padding-top: 1em;
+  text-align: center;
+  background-color: transparent;
+}
+.home_bp .btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+

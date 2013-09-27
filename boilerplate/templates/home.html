@@ -6,31 +6,26 @@
 
     {% if user_id %}
     <div class="hero-unit home_bp">
-        <h1>
-            Travel Map
-        </h1>
-        <p>
-            {% trans %}Congratulations on your Google App Engine Boilerplate powered page.{% endtrans %}
-            <br><a href="http://github.com/coto/gae-boilerplate/blob/master/README.md" target="_blank">
-            {% trans %}Learn why this Boilerplate Rocks{% endtrans %}</a> {% trans %}or just{% endtrans %} 
-            <a href="http://github.com/coto/gae-boilerplate/" target="_blank">{% trans %}download the Source Code{% endtrans %}</a> 
-            {% trans %}to help you to create your application.{% endtrans %}
+		<h1>Tripstory - share your travel</h1>
+    
+        <p><b>
+        {% trans %}Tripstory is your way to visualize and share your travel experience.<br/> 
+                 It connects locations, information, images and videos in a simple way.{% endtrans %}</b>
         </p>
+        <p><a class="btn btn-lg btn-success" href="/explore">Explore</a></p>
     </div>
     {% else %}
     <div class="row">
         <div class="span9">
             <div class="home_bp">
-                <h1>
-                    Travel Map
-                </h1>
-                <p>
-                    {% trans %}Congratulations on your Google App Engine Boilerplate powered page.{% endtrans %}
-                    <br><a href="http://github.com/coto/gae-boilerplate/blob/master/README.md" target="_blank">
-                    {% trans %}Learn why this Boilerplate Rocks{% endtrans %}</a> {% trans %}or just{% endtrans %} 
-                    <a href="http://github.com/coto/gae-boilerplate/" target="_blank">{% trans %}download the Source Code{% endtrans %}</a> 
-                    {% trans %}to help you to create your application.{% endtrans %}
+               
+                <h1>Tripstory - share your travel</h1>
+    
+                <p><b>
+                    {% trans %}Tripstory is your way to visualize and share your travel experience.<br/> 
+                    It connects locations, information, images and videos in a simple way.{% endtrans %}</b>
                 </p>
+                <p><a class="btn btn-lg btn-success" href="/explore">Explore</a></p>
             </div>
         </div>
         <div class="span3 auth-at-home">
@@ -59,7 +54,7 @@
                             <a href="{{ uri_for("password-reset") }}">{% trans %}Forgot your password?{% endtrans %}</a>
                         </label>
                     </div>
-                    {{ macros.federated_login(provider_info, provider_uris, enable_federated_login) }}
+              
                 </fieldset>
             </form>
 
