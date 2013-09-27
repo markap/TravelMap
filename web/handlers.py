@@ -16,24 +16,27 @@ from boilerplate.lib.decorators import user_required
 
 class StoryHandler(BaseHandler):
     
-    @user_required
+    #@user_required
     def get(self, **kwargs):
+        """
         user_info = models.User.get_by_id(long(self.user_id))
         params = {
             "user_info": user_info
         }
-        return self.render_template('story.html', **params)
+        """
+        return self.render_template('story.html')#, **params)
     
     
 class TripHandler(BaseHandler):
     
-    @user_required
+    #@user_required
     def get(self, **kwargs):
-        user_info = models.User.get_by_id(long(self.user_id))
+        """user_info = models.User.get_by_id(long(self.user_id))
         params = {
             "user_info": user_info
         }
-        return self.render_template('trip.html', **params)
+        """
+        return self.render_template('trip.html')#, **params)
     
 
     
