@@ -11,7 +11,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="keywords" content="">
-    <meta name="generator" content="Google App Engine Boilerplate 2.2.0-beta rev516 (g9b1f961)">
+    <meta name="generator" content="Tripstory - share your travel">
 
     <!-- Mobile viewport optimized: h5bp.com/viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -60,18 +60,7 @@
                 <a class="brand" href="/">{{ app_name }}</a>
                 <div class="nav-collapse">
                     <ul class="nav pull-right">
-                        {% if locale_iso %}
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                {% trans %}Language{% endtrans %} : {{ locale_language }} <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                            	{% for l in locales %}
-                                {% if locale_iso != l %}<li><a href="{{ path_for_language }}&hl={{ l }}">{{ locales[l] }}</a></li>{% endif %}
-                                {% endfor %}
-                            </ul>
-                        </li>
-                        {% endif %}
+                    
                         {% if user_id %}
                         <li class="divider-vertical"></li>
                         <li class="dropdown">
@@ -114,7 +103,7 @@
                                         <div class="control-group">
                                             <a href="{{ uri_for("password-reset") }}">{% trans %}Forgot your password?{% endtrans %}</a>
                                         </div>
-                                        {{ macros.federated_login(provider_info, provider_uris, enable_federated_login) }}
+                                        
                                     </fieldset>
                                 </form>
                             </div>
@@ -132,16 +121,7 @@
                 {% block header_title_lead %}
                 <h1>{% block header_title %}{{ app_name }}{% endblock %}</h1>
                 {% endblock %}
-                {% if not user_id %}
-                {% block subnavbar %}
-                <div class="subnav">
-                    <ul>
-                        <li{% if path == uri_for("register") %} class="active"{% endif %}><a href="{{ uri_for("register") }}">{% trans %}Sign Up{% endtrans %}</a></li>
-                        <li{% if path == uri_for("password-reset") %} class="active"{% endif %}><a href="{{ uri_for("password-reset") }}">{% trans %}Forgot your password?{% endtrans %}</a></li>
-                    </ul>
-                </div>
-                {% endblock %}
-                {% endif %}
+     
             </header>
             {% endblock %}
 
@@ -173,6 +153,7 @@
     <script src="/boilerplate/js/script.js"></script>
     <script src="/js/script.js"></script>
 <!--     <script src="/js/jquery-2.0.3.js"></script> -->
+
     {% if locale_language_id != "en" %}
         {% if locale_iso.language == "pt" and locale_iso.territory == "BR" %}
     <script src="/boilerplate/js/libs/jquery_validation/localization/messages_{{ locale_iso.language }}_{{ locale_iso.territory }}.js"></script>

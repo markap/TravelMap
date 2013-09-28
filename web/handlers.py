@@ -14,6 +14,26 @@ from boilerplate.lib.basehandler import BaseHandler
 from boilerplate.lib.decorators import user_required
 
 
+
+class ExploreHandler(BaseHandler):
+    
+    def get(self, **kwargs):
+        """
+        user_info = models.User.get_by_id(long(self.user_id))
+        params = {
+            "user_info": user_info
+        }
+        """
+        return self.render_template('explore.html')#, **params)
+
+
+class SearchHandler(BaseHandler):
+    
+    def get(self, **kwargs):
+        
+        
+        return self.render_template('search.html')
+
 class StoryHandler(BaseHandler):
     
     #@user_required

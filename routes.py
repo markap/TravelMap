@@ -9,9 +9,10 @@ from web import handlers
 secure_scheme = 'https'
 
 _routes = [
-    RedirectRoute('/secure/', handlers.SecureRequestHandler, name='secure', strict_slash=True),
     RedirectRoute('/story/', handlers.StoryHandler, name='story', strict_slash=True),
     RedirectRoute('/trip/', handlers.TripHandler, name='trip', strict_slash=True),
+    RedirectRoute('/explore/', handlers.ExploreHandler, name='explore', strict_slash=True),
+    RedirectRoute('/search/', handlers.SearchHandler, name='search', strict_slash=True),
 ]
 
 def get_routes():
