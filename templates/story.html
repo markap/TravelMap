@@ -1,10 +1,70 @@
 {% extends base_layout %}
 
+<!-- 
+{% block extrahead %}
+	<script src="story.js"></script>
+{% endblock %}
+ -->
+
 {% block header_title %}
     {% trans %}Stories{% endtrans %}
 {% endblock %}
 
 {% block content %}
+    <button id="buttonCreate" type="button" class="btn btn-primary">Create a new trip</button>
+    <br/><br/>
+    
+    <!-- List of the stories -->
+    <table class="table">
+    {% for story in stories %}
+  		<tr>
+  		<td>{{ story.name }}</td>
+  		<td>
+  			<button type="button" class="btn">View story</button>
+  		</td>
+  		</tr>
+	{% endfor %}
+    </table>
+    
+    <!-- Modal to create a new story -->
+    <div id="modalCreate" class="modal fade">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title">New trip story</h4>
+	      </div>
+	      <div class="modal-body">
+	        <form role="form">
+	          <div class="form-group">
+			  	<!-- Name -->
+			  	<label for="inputName" class="col-lg-2 control-label">Name</label>
+			    <div class="col-lg-10">
+			      <input class="form-control" type="text" id="inputName" placeholder="Name">
+			    </div>
+			    <!-- Description -->
+			    <label for="inputDesc">Description</label>
+			    <div class="col-lg-10">
+			    	<textarea class="form-control" type="text" id="inputDesc" rows="3" placeholder="A few words about the trip..."></textarea>
+			    </div>
+			  </div>
+	        </form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	        <button type="button" class="btn btn-primary">Create</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
+{% endblock %}
 
-    <button type="button" class="btn btn-primary">Create</button>
+{% block mediaJS %}
+    <script>
+    $().ready(function() {
+		$('#buttonCreate').click(function() {
+			$('#modalCreate').modal('show');
+		});
+	});
+	</script>
 {% endblock %}

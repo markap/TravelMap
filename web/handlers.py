@@ -24,7 +24,11 @@ class StoryHandler(BaseHandler):
             "user_info": user_info
         }
         """
-        return self.render_template('story.html')#, **params)
+        params = {
+            "stories": [{"name" : "Busan"}, {"name" : "Daejeon"}, {"name" : "Jeju"}, {"name" : "Tokyo"}]
+        }
+        
+        return self.render_template('story.html', **params)
     
     
 class TripHandler(BaseHandler):
@@ -36,12 +40,8 @@ class TripHandler(BaseHandler):
             "user_info": user_info
         }
         """
+
         return self.render_template('trip.html')#, **params)
-    
-
-    
-
-    
 
 class SecureRequestHandler(BaseHandler):
     """
