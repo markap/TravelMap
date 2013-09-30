@@ -30,9 +30,12 @@ class ExploreHandler(BaseHandler):
 class SearchHandler(BaseHandler):
     
     def get(self, **kwargs):
+        params = {
+            "stories": [{"name" : "Busan"}, {"name" : "Daejeon"}, {"name" : "Jeju"}, {"name" : "Tokyo"}]
+        }
         
         
-        return self.render_template('search.html')
+        return self.render_template('search.html', **params)
 
 class StoryHandler(BaseHandler):
     

@@ -22,9 +22,14 @@
 			<!-- Custom description -->
 			<p>This city is so cool !</p>
 			
+			<hr />
+			<h4>Jagalchi Market</h4>
+			<!-- Custom description -->
+			<p>The best fishmarket I've ever been to</p>
 			<!-- Wikipedia description -->
-			<p><em><small>
-			Busan (부산 (Korean pronunciation: [pusan]), officially Busan Metropolitan City), Latinized Pusan before 2000,[3] is South Korea's second largest metropolis after Seoul, with a population of approximately 3.6 million.[1] The Metropolitan area (includes adjacent cities of Gimhae and Yangsan) population is 4,573,533 as of December 2012. Including Ulsan and South Gyeongsang Province, its population is over 8 million.[4] It has Korea's largest beach and longest river. It is the largest port city in South Korea and the world's fifth busiest seaport by cargo tonnage.[5] The city is located on the southeastern-most tip of the Korean peninsula. The most densely built up areas of the city are situated in a number of narrow valleys between the Nakdong River and Suyeong River, with mountains separating some of the districts. Administratively, it is designated as a Metropolitan City. The Busan metropolitan area is divided into 15 major administrative districts and a single county.
+			<p><img src="/img/wiki.png" alt="Wiki">
+			<em><small>
+			Jagalchi Fish Market is a fish market in the neighborhood of Nampo-dong in Jung-gu, and Chungmu-dong, Seo-gu, Busan, South Korea.[1] The market is located on the edge of Nampo Port, Busan. The name is said to have originated from jagal (gravel in Korean) because the market used to be surrounded by many gravels.[2] This is one of the ten landmarks of Busan, so many tourists visit there to shop.
 			</small></em></p>
 			
 			<!-- Related pictures -->
@@ -52,11 +57,12 @@
     <script>
 		function initialize() {
   			var map = new google.maps.Map(document.getElementById('map-canvas'), {
-    			mapTypeId: google.maps.MapTypeId.ROADMAP
+    			mapTypeId: google.maps.MapTypeId.ROADMAP,
+    			zoom: 7
   			});
   			var defaultBounds = new google.maps.LatLngBounds(
-      			new google.maps.LatLng(-33.8902, 151.1759),
-      			new google.maps.LatLng(-33.8474, 151.2631));
+      			new google.maps.LatLng(35.129554, 129.015642),
+      			new google.maps.LatLng(35.209554, 129.105642));
   			map.fitBounds(defaultBounds);
 
   			var input = /** @type {HTMLInputElement} */(document.getElementById('target'));
@@ -70,7 +76,8 @@
     		for (var i = 0, marker; marker = markers[i]; i++) {
       			marker.setMap(null);
     		}
-
+    		
+    		
     		markers = [];
     		var bounds = new google.maps.LatLngBounds();
     		for (var i = 0, place; place = places[i]; i++) {
@@ -102,6 +109,9 @@
       			bounds.extend(place.geometry.location);
     		}
 
+
+		
+			
     		map.fitBounds(bounds);
   		});
 
@@ -112,17 +122,36 @@
   		
 	
 	
-	var clickMarker;
+		console.log("hallo");
+    		// sample markers
+    		var sample_markers = [[35.137879, 129.120598],
+    								[35.156968, 129.181023],
+    								[35.101089, 129.032537]];
+    		for (var i = 0; i < 3; i++) {
+    		
+  			 	console.log(i);
+  			 	var marker = new google.maps.Marker({
+        			map: map,
+        			icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        			position: new google.maps.LatLng(sample_markers[i][0], sample_markers[i][1]),
+      			});
+      		}
 	
+	var clickMarker;
+
 	function placeMarker(location) {
-  		if (clickMarker) {
-    		clickMarker.setPosition(location);
-  		} else {
+  		
     		clickMarker = new google.maps.Marker({
       			position: location,
+      			info: new google.maps.InfoWindow({
+      				content: "New Location <button class='button primary-btn'>Create</button>"
+  				}),
+      			
       			map: map
     		});
-  		}
+    		clickMarker.info.open(map, clickMarker);
+  		
+  		
 	}
 	google.maps.event.addListener(map, 'click', function(event) {
   		placeMarker(event.latLng);
