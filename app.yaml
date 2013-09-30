@@ -60,6 +60,9 @@ handlers:
 - url: /boilerplate/js
   mime_type: text/javascript
   static_dir: boilerplate/static/js
+  
+- url: /boilerplate/fonts
+  static_dir: boilerplate/static/fonts 
 
 - url: /boilerplate/img/(.*\.(gif|png|jpg))
   static_files: boilerplate/static/img/\1

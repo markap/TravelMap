@@ -53,9 +53,65 @@
 		</div>
 	</div>
     
+    <!-- Modal to create a new location -->
+    <div id="modalCreateLocation" class="modal fade">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title">New location</h4>
+	      </div>
+	      <div class="modal-body">
+	        <form class="form-horizontal" role="form">
+				<!-- Name -->
+		        <div class="form-group">
+					<label for="inputName" class="col-lg-2 control-label">Name</label>
+					<div class="col-lg-10">
+			    		<input class="form-control" type="text" id="inputName" placeholder="Name of the location">
+					</div>
+				</div>
+			  
+			    <!-- Description -->
+		        <div class="form-group">
+				    <label for="inputDesc" class="col-lg-2 control-label">Description</label>
+				    <div class="col-lg-10">
+				    	<textarea class="form-control" type="text" id="inputDesc" rows="3" placeholder="What you did there"></textarea>
+				    </div>
+			    </div>
+			    
+			    <!-- Pictures upload -->
+			    <div class="form-group">
+					<label for="inputFile" class="col-lg-2 control-label">Pictures</label>
+				    <div class="col-lg-10">
+					    <input type="file" id="inputFile">
+					    <p class="help-block"></p>
+					</div>
+				</div>
+				<span id="picturesUpload"></span>
+	        </form>
+	        <button id="buttonMore" class="btn btn-primary btn-xs">+ More</button>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	        <button type="button" class="btn btn-primary">Create</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+    
+    
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
     <script>
+    	// Open modal to create a new location
+		function openModal() {
+			$('#modalCreateLocation').modal('show');
+		}
+    
 		function initialize() {
+			// Add new pictures
+    		$('#buttonMore').click(function(){
+    			$('#picturesUpload').append('<div class="form-group"><label for="inputFile" class="col-lg-2 control-label"></label><div class="col-lg-10"><input type="file" id="inputFile"><p class="help-block"></p></div></div>');
+    		});
+
   			var map = new google.maps.Map(document.getElementById('map-canvas'), {
     			mapTypeId: google.maps.MapTypeId.ROADMAP,
     			zoom: 7
@@ -144,7 +200,7 @@
     		clickMarker = new google.maps.Marker({
       			position: location,
       			info: new google.maps.InfoWindow({
-      				content: "New Location <button class='button primary-btn'>Create</button>"
+      				content: "New Location <button class='button primary-btn' onClick='openModal();'>Create</button>"
   				}),
       			
       			map: map
