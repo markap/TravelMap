@@ -15,15 +15,17 @@
     <br/><br/>
     
     <!-- List of the stories -->
-    <table class="table">
-    {% for story in stories %}
-  		<tr>
-  		<td>{{ story.name }}</td>
-  		<td>
-  			<button type="button" class="btn">View story</button>
-  		</td>
-  		</tr>
-	{% endfor %}
+    <table class="table table-hover">
+	    <tbody>
+			{% for story in stories %}
+			    <tr>
+			  		<td>{{ story.name }}</td>
+			  		<td>
+			  			<button type="button" class="btn">View story</button>
+			  		</td>
+			  	</tr>
+			{% endfor %}
+    	</tbody>
     </table>
     
     <!-- Modal to create a new story -->
@@ -34,19 +36,36 @@
 	        <h4 class="modal-title">New trip story</h4>
 	      </div>
 	      <div class="modal-body">
-	        <form role="form">
-	          <div class="form-group">
-			  	<!-- Name -->
-			  	<label for="inputName" class="col-lg-2 control-label">Name</label>
-			    <div class="col-lg-10">
-			      <input class="form-control" type="text" id="inputName" placeholder="Name">
-			    </div>
+	        <form class="form-horizontal" role="form">
+				<!-- Name -->
+		        <div class="form-group">
+					<label for="inputName" class="col-lg-2 control-label">Name</label>
+					<div class="col-lg-10">
+			    		<input class="form-control" type="text" id="inputName" placeholder="Name of your trip">
+					</div>
+				</div>
+			  
+				<!-- Dates of the trip -->
+			  	<div class="form-group">
+			  		<label for="dateBegin" class="col-lg-2 control-label">From</label>
+			  		<div class="col-lg-10">
+			  			<input id="dateBegin" class="form-control datepicker" type="text" data-date-format="mm/dd/yy"/>
+			  		</div>
+			  	</div>
+			  	<div class="form-group">
+			  		<label for="dateEnd" class="col-lg-2 control-label">To</label>
+			  		<div class="col-lg-10">
+				  		<input id="dateEnd" class="form-control datepicker" type="text"/>
+					</div>
+			  	</div>
+			  
 			    <!-- Description -->
-			    <label for="inputDesc">Description</label>
-			    <div class="col-lg-10">
-			    	<textarea class="form-control" type="text" id="inputDesc" rows="3" placeholder="A few words about the trip..."></textarea>
+		        <div class="form-group">
+				    <label for="inputDesc" class="col-lg-2 control-label">Description</label>
+				    <div class="col-lg-10">
+				    	<textarea class="form-control" type="text" id="inputDesc" rows="3" placeholder="A few words about the trip..."></textarea>
+				    </div>
 			    </div>
-			  </div>
 	        </form>
 	      </div>
 	      <div class="modal-footer">
@@ -65,6 +84,36 @@
 		$('#buttonCreate').click(function() {
 			$('#modalCreate').modal('show');
 		});
+		
+		// Date picker
+		$('#dateBegin').datepicker();
+		$('#dateEnd').datepicker();
+		
+		var nowTemp = new Date();
+		var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+		
+		var dateBegin = $('#dateBegin').datepicker({
+			format : 'dd/mm/yy'
+		})
+		.on('changeDate', function(ev) {
+	  		if (ev.date.valueOf() > dateEnd.date.valueOf()) {
+	    		var newDate = new Date(ev.date)
+	    		newDate.setDate(newDate.getDate() + 1);
+	    		dateEnd.setValue(newDate);
+			}
+			dateBegin.hide();
+			$('#dateEnd').focus();
+		}).data('datepicker');
+		
+		var dateEnd = $('#dateEnd').datepicker({
+			format: 'dd/mm/yy',
+		  onRender: function(date) {
+		    return date.valueOf() <= dateBegin.date.valueOf() ? 'disabled' : '';
+		  }
+		}).on('changeDate', function(ev) {
+		  dateEnd.hide();
+		}).data('datepicker');
+
 	});
 	</script>
 {% endblock %}
