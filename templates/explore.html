@@ -11,20 +11,58 @@
 	<div id="panel">
       <input id="target" type="text" placeholder="Location">
     </div>
-    <div style="height:500px; width:600px; margin: 0; padding: 0;" id="map-canvas"></div>
+    <div style="height:500px; width:900px; margin: 0; padding: 0;" id="map-canvas"></div>
     
     
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
     <script>
 		function initialize() {
   			var map = new google.maps.Map(document.getElementById('map-canvas'), {
-    			mapTypeId: google.maps.MapTypeId.ROADMAP
+    			mapTypeId: google.maps.MapTypeId.ROADMAP,
+    			center: new google.maps.LatLng(0, 0),
+          		zoom: 2,
   			});
-  			var defaultBounds = new google.maps.LatLngBounds(
+  			/**var defaultBounds = new google.maps.LatLngBounds(
       			new google.maps.LatLng(-33.8902, 151.1759),
       			new google.maps.LatLng(-33.8474, 151.2631));
-  			map.fitBounds(defaultBounds);
+  			map.fitBounds(defaultBounds);*/
+  			
+  			/**
+  			 * Add some random locations
+  			 */
+  			 var sample_locations = [[40.714353, -74.005973, "New York"], [-33.924869, 18.424055, "Cape town"],
+  			 						 [37.566535, 126.977969, "Seoul"], [35.689487, 139.691706, "Tokyo"], 
+  			 						 [39.904030,116.407526, "Beijing"],
+  			 						 [14.599512, 120.984219, "Manila"], [-23.548943, -46.638818, "Sao Paulo"], 
+  			 						 [35.179554, 129.075642, "Busan"], [27.174526,78.042153, "Taj Mahal"]];
+  			 var sample_markers = [];
+  			 var sample_infowindows = [];
+  			 
+  			 for (var i = 0; i < 9; i++) {
+  			 	console.log(i);
+  			 	var marker = new google.maps.Marker({
+        			map: map,
+        			position: new google.maps.LatLng(sample_locations[i][0], sample_locations[i][1]),
+        			info: new google.maps.InfoWindow({
+  							content: '<b>' + sample_locations[i][2] + '</b><br /><br /><button type="button" class="btn btn-primary">Explore</button>'
+					})
+      			});
+      			sample_markers.push(marker);
+      			
+      			var open = null;
+      			google.maps.event.addListener(marker, 'click', (function(m) {
+      				return function() {
+      				    if (open) open.info.close();
+      					m.info.open(map, m);
+      					open = m;
+      				};
+				})(marker)); 
+				 			
+      			
 
+      			
+      		}
+			console.log("hallo");
   			var input = /** @type {HTMLInputElement} */(document.getElementById('target'));
   			console.log(input);
   			var searchBox = new google.maps.places.SearchBox(input);
@@ -77,22 +115,7 @@
   		});
   		
 	
-	
-	var clickMarker;
-	
-	function placeMarker(location) {
-  		if (clickMarker) {
-    		clickMarker.setPosition(location);
-  		} else {
-    		clickMarker = new google.maps.Marker({
-      			position: location,
-      			map: map
-    		});
-  		}
-	}
-	google.maps.event.addListener(map, 'click', function(event) {
-  		placeMarker(event.latLng);
-	});
+
 	}
 
 
