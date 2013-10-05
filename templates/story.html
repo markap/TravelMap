@@ -21,7 +21,7 @@
 			    <tr>
 			  		<td>{{ story.name }}</td>
 			  		<td>
-			  			<button type="button" class="btn btn-primary">View story</button>
+			  			<a href="/trip/{{ story.id }}">View story</a>
 			  		</td>
 			  	</tr>
 			{% endfor %}
@@ -70,7 +70,7 @@
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-	        <button type="button" class="btn btn-primary">Create</button>
+	        <button type="button" class="btn btn-primary" id="createStory">Create</button>
 	      </div>
 	    </div><!-- /.modal-content -->
 	  </div><!-- /.modal-dialog -->
@@ -83,6 +83,20 @@
     $().ready(function() {
 		$('#buttonCreate').click(function() {
 			$('#modalCreate').modal('show');
+		});
+		
+		$('#createStory').click(function() {
+		
+			
+			
+			$.ajax({
+  				type: "POST",
+  				url: '/story.register/',
+  				data: {'name': $('#inputName').val(),
+  						'datefrom': $('#dataBegin').val(),
+  						'dateto': $('#dateEnd').val(),
+  						'desc': $('#inputDesc').val()}
+			});
 		});
 		
 		// Date picker

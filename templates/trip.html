@@ -17,15 +17,15 @@
 		
 		<div class="col-md-6"><!-- Informations about selection -->
 			<!-- Name of the place -->
-			<h3>Busan</h3>
+			<h3>{{ story.name }}</h3>
 			
 			<!-- Custom description -->
-			<p>This city is so cool !</p>
+			<p>{{ story.desc }}</p>
 			
 			<hr />
-			<h4>Jagalchi Market</h4>
+			<h4 id="locName">Jagalchi Market</h4>
 			<!-- Custom description -->
-			<p>The best fishmarket I've ever been to</p>
+			<p id="locDesc">The best fishmarket I've ever been to</p>
 			<!-- Wikipedia description -->
 			<p><img src="/img/wiki.png" alt="Wiki">
 			<em><small>
@@ -66,7 +66,7 @@
 		        <div class="form-group">
 					<label for="inputName" class="col-lg-2 control-label">Name</label>
 					<div class="col-lg-10">
-			    		<input class="form-control" type="text" id="inputName" placeholder="Name of the location">
+			    		<input class="form-control" type="text" id="locationInputName" placeholder="Name of the location">
 					</div>
 				</div>
 			  
@@ -74,7 +74,7 @@
 		        <div class="form-group">
 				    <label for="inputDesc" class="col-lg-2 control-label">Description</label>
 				    <div class="col-lg-10">
-				    	<textarea class="form-control" type="text" id="inputDesc" rows="3" placeholder="What you did there"></textarea>
+				    	<textarea class="form-control" type="text" id="locationInputDesc" rows="3" placeholder="What you did there"></textarea>
 				    </div>
 			    </div>
 			    
@@ -92,12 +92,15 @@
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-	        <button type="button" class="btn btn-primary">Create</button>
+	        <button type="button" id="addLocation" class="btn btn-primary">Create</button>
 	      </div>
 	    </div><!-- /.modal-content -->
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
     
+{% endblock %}
+
+{% block mediaJS %}
     
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
     <script>
@@ -107,6 +110,7 @@
 		}
     
 		function initialize() {
+			$.ajax
 			// Add new pictures
     		$('#buttonMore').click(function(){
     			$('#picturesUpload').append('<div class="form-group"><label for="inputFile" class="col-lg-2 control-label"></label><div class="col-lg-10"><input type="file" id="inputFile"><p class="help-block"></p></div></div>');
@@ -169,33 +173,65 @@
 		
 			
     		map.fitBounds(bounds);
+    		
+    		
+    		
+			
   		});
-
+	
   		google.maps.event.addListener(map, 'bounds_changed', function() {
     		var bounds = map.getBounds();
     		searchBox.setBounds(bounds);
   		});
   		
-	
-	
-		console.log("hallo");
-    		// sample markers
-    		var sample_markers = [[35.137879, 129.120598],
-    								[35.156968, 129.181023],
-    								[35.101089, 129.032537]];
-    		for (var i = 0; i < 3; i++) {
-    		
-  			 	console.log(i);
-  			 	var marker = new google.maps.Marker({
-        			map: map,
+		$.ajax({
+  				type: "POST",
+  				url: '/story.detail/' + {{ story.id }},
+  				success: updateMarkers
+		});
+		
+		var global_locations;
+		
+		function get_location_for_index(idx) {
+			for (var i = 0; i < global_locations.length; i++) {
+				loc = global_locations[i];
+				if (loc.locationindex == idx) {
+					return loc;
+				}
+			} 
+		}
+		
+		function updateMarkers(data) {
+			global_locations = data.record.locations;
+			for (var i = 0; i < global_locations.length; i++) {
+				loc = global_locations[i];
+				
+			
+				var marker = new google.maps.Marker({
+       				map: map,
+       				locationindex: loc.locationindex,
         			icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        			position: new google.maps.LatLng(sample_markers[i][0], sample_markers[i][1]),
+        			position: new google.maps.LatLng(loc.latitude, loc.longitude),
       			});
-      		}
-	
-	var clickMarker;
+      			
+      			google.maps.event.addListener(marker, 'click', (function(m) {
+      				return function() {
+      				    loc = get_location_for_index(m.locationindex);
+      				    
+      				    if (loc != null) {
+      				    	      				    	
+      				    	$('#locName').text(loc.name);
+      				    	$('#locDesc').text(loc.desc);
+      				    	
+      				    }
+      				};
+				})(marker)); 
+			}
+		}
+		
+		var clickMarker;
 
-	function placeMarker(location) {
+		function placeMarker(location) {
   		
     		clickMarker = new google.maps.Marker({
       			position: location,
@@ -208,10 +244,31 @@
     		clickMarker.info.open(map, clickMarker);
   		
   		
-	}
-	google.maps.event.addListener(map, 'click', function(event) {
-  		placeMarker(event.latLng);
-	});
+		}
+		var latestPosition;
+		google.maps.event.addListener(map, 'click', function(event) {
+			latestPosition = {'latitude': event.latLng.lat(),
+							   'longitude': event.latLng.lng()
+							   };
+  			placeMarker(event.latLng);
+		});
+		
+		$('#addLocation').click(function() {
+			
+			data = {'name': $('#locationInputName').val(),
+					'desc': $('#locationInputDesc').val(),
+					'latitude': latestPosition.latitude,
+					'longitude': latestPosition.longitude
+					};
+			
+			
+			$.ajax({
+  				type: "POST",
+  				url: '/story.addlocation/' + {{ story.id }},
+  				data: data
+			});
+				
+		});
 	}
 
 

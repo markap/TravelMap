@@ -13,6 +13,7 @@ from webapp2_extras import sessions
 from boilerplate import models
 from boilerplate.lib import utils, i18n
 from babel import Locale
+from web import message
 
 
 def generate_csrf_token():
@@ -55,6 +56,34 @@ class ViewClass:
     """
     pass
 
+
+class JSONHandler(webapp2.RequestHandler):
+    
+    def __init__(self, *args, **kwargs):
+        super(JSONHandler, self).__init__(*args, **kwargs)
+        self.json = message.Message()
+        self.json.clear()
+        self.error = []
+                
+    def add_error(self, id_, message):
+        self.error.append({'id': id_, 'message': message})
+        
+    def get_errors(self):
+        return self.error
+    
+    def has_errors(self):
+        return len(self.error) > 0
+        
+        
+    @property
+    def msg(self):
+        return self.json
+        
+    def print_json(self):
+        self.response.out.clear()
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(self.json)
+        
 
 class BaseHandler(webapp2.RequestHandler):
     """

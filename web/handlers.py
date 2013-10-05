@@ -9,10 +9,13 @@
     Routes are setup in routes.py and added in main.py
 """
 import httpagentparser
+from google.appengine.ext import ndb
+
 from boilerplate import models
-from boilerplate.lib.basehandler import BaseHandler
+from boilerplate.lib.basehandler import BaseHandler, JSONHandler
 from boilerplate.lib.decorators import user_required
 
+from web import models as m, parser
 
 
 class ExploreHandler(BaseHandler):
@@ -47,24 +50,80 @@ class StoryHandler(BaseHandler):
             "user_info": user_info
         }
         """
+     
         params = {
-            "stories": [{"name" : "Busan"}, {"name" : "Daejeon"}, {"name" : "Jeju"}, {"name" : "Tokyo"}]
+            "stories": parser.ndb_list_parser(m.Story.query())
         }
         
+        print params
         return self.render_template('story.html', **params)
+       
     
+class StoryRegisterHandler(JSONHandler):
+    
+    #@user_required
+    def post(self):
+        
+        story = m.Story(name=self.request.get('name'),
+                     #dateto=self.request.get('dateto'),
+                     #datefrom=self.request.get('datefrom'),
+                     desc=self.request.get('desc'))
+        
+        storykey = story.put()
+        
+        self.msg.add_record('storykey', storykey.id())
+        self.print_json()
+
+class StoryDetail(JSONHandler):
+    
+    def post(self, storyid):
+        story = m.Story.get_by_id(int(storyid))
+        self.msg.add_record('locations', story.locations);
+        self.print_json()
+    
+class StoryAddLocationHandler(JSONHandler):
+    
+    #@user_required
+    def post(self, storyid):
+        story = m.Story.get_by_id(int(storyid))
+        
+        location_index = story.location_index
+        story.location_index += 1
+        
+        story.latitude = float(self.request.get('latitude'))
+        story.longitude = float(self.request.get('longitude'))
+        
+        location = {
+            'locationindex': location_index,
+            'name': self.request.get('name'),
+            'desc': self.request.get('desc'),
+            'latitude': float(self.request.get('latitude')),
+            'longitude': float(self.request.get('longitude'))
+        }
+        
+        story.locations.append(location)
+        story.put()
+        
+          
     
 class TripHandler(BaseHandler):
     
     #@user_required
-    def get(self, **kwargs):
+    def get(self, storyid, **kwargs):
         """user_info = models.User.get_by_id(long(self.user_id))
         params = {
             "user_info": user_info
         }
         """
-
-        return self.render_template('trip.html')#, **params)
+        
+        print ndb.Key('Story', int(storyid)).get()
+        print m.Story.get_by_id(int(storyid))
+        params = {
+            "story": parser.ndb_obj_parser(m.Story.get_by_id(int(storyid)))
+        }
+        
+        return self.render_template('trip.html', **params)
+    
 
 class SecureRequestHandler(BaseHandler):
     """
