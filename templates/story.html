@@ -37,6 +37,7 @@
 	      </div>
 	      <div class="modal-body">
 	        <form class="form-horizontal" role="form">
+	        	<div id="modalError"></div>
 				<!-- Name -->
 		        <div class="form-group">
 					<label for="inputName" class="col-lg-2 control-label">Name</label>
@@ -69,7 +70,7 @@
 	        </form>
 	      </div>
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	        <button type="button" class="btn btn-default" id="buttonCancel" data-dismiss="modal">Cancel</button>
 	        <button type="button" class="btn btn-primary" id="createStory">Create</button>
 	      </div>
 	    </div><!-- /.modal-content -->
@@ -85,29 +86,50 @@
 			$('#modalCreate').modal('show');
 		});
 		
-		$('#createStory').click(function() {
+		$('#buttonCancel').click(function(){
+			// Clean the modal
+			$('#inputName').val('');
+			$('#inputDesc').val('');
+			// FIX ME
+			$('#dataBegin').datepicker('setValue', '');
+			$('#dataEnd').datepicker('setValue', '');
+		});
 		
-			
-			
-			$.ajax({
-  				type: "POST",
-  				url: '/story.register/',
-  				data: {'name': $('#inputName').val(),
-  						'datefrom': $('#dataBegin').val(),
-  						'dateto': $('#dateEnd').val(),
-  						'desc': $('#inputDesc').val()}
-			});
+		$('#createStory').click(function() {
+			var name = $('#inputName').val();
+			if(name) {
+				$.ajax({
+	  				type: "POST",
+	  				url: '/story.register/',
+	  				data: {'name': $('#inputName').val(),
+	  						'datefrom': $('#dataBegin').val(),
+	  						'dateto': $('#dateEnd').val(),
+	  						'desc': $('#inputDesc').val()}
+				})
+				.done(function(data) {
+					if(data.status == 'OK'){
+						// Close the modal
+						$('#modalCreate').modal('hide');
+						// Redirect to trip page
+						var url = "/trip/" + data.record.storykey;
+						window.location.replace(url);
+					} else {
+						// Server error
+						$('#modalError').html('<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><strong>Sorry!</strong> An internal error occured, please try again</div>');
+					}
+				});
+			} else {
+				$('#modalError').html('<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><strong>Error!</strong> The name of the trip is mandatory</div>');
+			}
 		});
 		
 		// Date picker
-		$('#dateBegin').datepicker();
-		$('#dateEnd').datepicker();
-		
 		var nowTemp = new Date();
 		var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
 		
 		var dateBegin = $('#dateBegin').datepicker({
-			format : 'dd/mm/yy'
+			format : 'dd/mm/yy',
+			weekStart : 1
 		})
 		.on('changeDate', function(ev) {
 	  		if (ev.date.valueOf() > dateEnd.date.valueOf()) {
@@ -121,6 +143,7 @@
 		
 		var dateEnd = $('#dateEnd').datepicker({
 			format: 'dd/mm/yy',
+			weekStart : 1,
 		  onRender: function(date) {
 		    return date.valueOf() <= dateBegin.date.valueOf() ? 'disabled' : '';
 		  }
