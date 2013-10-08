@@ -15,7 +15,10 @@ from boilerplate import models
 from boilerplate.lib.basehandler import BaseHandler, JSONHandler
 from boilerplate.lib.decorators import user_required
 
+from datetime import datetime
+
 from web import models as m, parser
+
 
 
 class ExploreHandler(BaseHandler):
@@ -64,21 +67,41 @@ class StoryRegisterHandler(JSONHandler):
     #@user_required
     def post(self):
         
+        dateto = self.request.get('dateto')
+        datefrom = self.request.get('datefrom')
+        
         story = m.Story(name=self.request.get('name'),
-                     #dateto=self.request.get('dateto'),
-                     #datefrom=self.request.get('datefrom'),
+                     dateto=datetime.strptime(dateto, '%d/%m/%Y'),
+                     datefrom=datetime.strptime(datefrom, '%d/%m/%Y'),
                      desc=self.request.get('desc'))
         
         storykey = story.put()
         
         self.msg.add_record('storykey', storykey.id())
         self.print_json()
+        
+
+class StoryEditHandler(JSONHandler):
+    
+    def post(self, storyid):
+        story = m.Story.get_by_id(int(storyid))
+        dateto = self.request.get('dateto')
+        datefrom = self.request.get('datefrom')
+        
+        story.name = self.request.get('name')
+        story.dateto = datetime.strptime(dateto, '%d/%m/%Y'),
+        story.datefrom = datetime.strptime(datefrom, '%d/%m/%Y'),
+        story.desc = self.request.get('desc')
+               
+        self.print_json()        
+                
+
 
 class StoryDetail(JSONHandler):
     
     def post(self, storyid):
         story = m.Story.get_by_id(int(storyid))
-        self.msg.add_record('locations', story.locations);
+        self.msg.add_record('locations', story.locations)
         self.print_json()
     
 class StoryAddLocationHandler(JSONHandler):
@@ -104,6 +127,30 @@ class StoryAddLocationHandler(JSONHandler):
         story.locations.append(location)
         story.put()
         
+        self.msg.add_record('location', location)
+        self.print_json()
+    
+    
+class StoryEditLocationHandler(JSONHandler):
+    
+    #@user_required
+    def post(self, storyid, locationindex):
+        story = m.Story.get_by_id(int(storyid))
+        
+        target_location = None
+                
+        for loc in story.locations:
+            if loc.locationindex == locationindex:
+                loc['name'] = self.request.get('name')
+                loc['desc'] = self.request.get('desc')
+                target_location = loc
+                break
+        
+
+        story.put()    
+        
+        self.msg.add_record('location', target_location)
+        self.print_json()
           
     
 class TripHandler(BaseHandler):

@@ -50,7 +50,7 @@
 			  	<div class="form-group">
 			  		<label for="dateBegin" class="col-lg-2 control-label">From</label>
 			  		<div class="col-lg-10">
-			  			<input id="dateBegin" class="form-control datepicker" type="text" data-date-format="mm/dd/yy"/>
+			  			<input id="dateBegin" class="form-control datepicker" type="text" />
 			  		</div>
 			  	</div>
 			  	<div class="form-group">
@@ -91,8 +91,8 @@
 			$('#inputName').val('');
 			$('#inputDesc').val('');
 			// FIX ME
-			$('#dataBegin').datepicker('setValue', '');
-			$('#dataEnd').datepicker('setValue', '');
+			//$('#dataBegin').datepicker('setValue', '');
+			//$('#dataEnd').datepicker('setValue', '');
 		});
 		
 		$('#createStory').click(function() {
@@ -102,7 +102,7 @@
 	  				type: "POST",
 	  				url: '/story.register/',
 	  				data: {'name': $('#inputName').val(),
-	  						'datefrom': $('#dataBegin').val(),
+	  						'datefrom': $('#dateBegin').val(),
 	  						'dateto': $('#dateEnd').val(),
 	  						'desc': $('#inputDesc').val()}
 				})
@@ -128,7 +128,7 @@
 		var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
 		
 		var dateBegin = $('#dateBegin').datepicker({
-			format : 'dd/mm/yy',
+			format : 'dd/mm/yyyy',
 			weekStart : 1
 		})
 		.on('changeDate', function(ev) {
@@ -142,7 +142,7 @@
 		}).data('datepicker');
 		
 		var dateEnd = $('#dateEnd').datepicker({
-			format: 'dd/mm/yy',
+			format: 'dd/mm/yyyy',
 			weekStart : 1,
 		  onRender: function(date) {
 		    return date.valueOf() <= dateBegin.date.valueOf() ? 'disabled' : '';
