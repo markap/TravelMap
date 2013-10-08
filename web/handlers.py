@@ -15,7 +15,10 @@ from boilerplate import models
 from boilerplate.lib.basehandler import BaseHandler, JSONHandler
 from boilerplate.lib.decorators import user_required
 
+from datetime import datetime
+
 from web import models as m, parser
+
 
 
 class ExploreHandler(BaseHandler):
@@ -64,9 +67,12 @@ class StoryRegisterHandler(JSONHandler):
     #@user_required
     def post(self):
         
+        dateto = self.request.get('dateto')
+        datefrom = self.request.get('datefrom')
+        
         story = m.Story(name=self.request.get('name'),
-                     #dateto=self.request.get('dateto'),
-                     #datefrom=self.request.get('datefrom'),
+                     dateto=datetime.strptime(dateto, '%d/%m/%Y'),
+                     datefrom=datetime.strptime(datefrom, '%d/%m/%Y'),
                      desc=self.request.get('desc'))
         
         storykey = story.put()

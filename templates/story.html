@@ -49,7 +49,7 @@
 			  	<div class="form-group">
 			  		<label for="dateBegin" class="col-lg-2 control-label">From</label>
 			  		<div class="col-lg-10">
-			  			<input id="dateBegin" class="form-control datepicker" type="text" data-date-format="mm/dd/yy"/>
+			  			<input id="dateBegin" class="form-control datepicker" type="text" />
 			  		</div>
 			  	</div>
 			  	<div class="form-group">
@@ -93,7 +93,7 @@
   				type: "POST",
   				url: '/story.register/',
   				data: {'name': $('#inputName').val(),
-  						'datefrom': $('#dataBegin').val(),
+  						'datefrom': $('#dateBegin').val(),
   						'dateto': $('#dateEnd').val(),
   						'desc': $('#inputDesc').val()}
 			});
@@ -107,7 +107,7 @@
 		var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
 		
 		var dateBegin = $('#dateBegin').datepicker({
-			format : 'dd/mm/yy'
+			format : 'dd/mm/yyyy'
 		})
 		.on('changeDate', function(ev) {
 	  		if (ev.date.valueOf() > dateEnd.date.valueOf()) {
@@ -120,7 +120,7 @@
 		}).data('datepicker');
 		
 		var dateEnd = $('#dateEnd').datepicker({
-			format: 'dd/mm/yy',
+			format: 'dd/mm/yyyy',
 		  onRender: function(date) {
 		    return date.valueOf() <= dateBegin.date.valueOf() ? 'disabled' : '';
 		  }
