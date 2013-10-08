@@ -99,9 +99,7 @@
 			});
 		});
 		
-		// Date picker
-		$('#dateBegin').datepicker();
-		$('#dateEnd').datepicker();
+
 		
 		var nowTemp = new Date();
 		var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
@@ -121,7 +119,7 @@
 		
 		var dateEnd = $('#dateEnd').datepicker({
 			format: 'dd/mm/yyyy',
-		  onRender: function(date) {
+		  	onRender: function(date) {
 		    return date.valueOf() <= dateBegin.date.valueOf() ? 'disabled' : '';
 		  }
 		}).on('changeDate', function(ev) {

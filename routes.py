@@ -11,8 +11,12 @@ secure_scheme = 'https'
 _routes = [
     RedirectRoute('/story/', handlers.StoryHandler, name='story', strict_slash=True),
     RedirectRoute('/story.register/', handlers.StoryRegisterHandler, name='storyregister', strict_slash=True),
-    RedirectRoute('/story.detail/<storyid>', handlers.StoryDetail, name='storydetail', strict_slash=True),
+    RedirectRoute('/story.edit/<storyid>', handlers.StoryEditHandler, name='storyedit', strict_slash=True),
+    RedirectRoute('/story.delete/<storyid>', handlers.StoryDeleteHandler, name='storydelete', strict_slash=True),
+    RedirectRoute('/story.detail/<storyid>', handlers.StoryDetailHandler, name='storydetail', strict_slash=True),
     RedirectRoute('/story.addlocation/<storyid>', handlers.StoryAddLocationHandler, name='storyaddlocation', strict_slash=True),
+    RedirectRoute('/story.editlocation/<storyid>/<locationindex>', handlers.StoryEditLocationHandler, name='storyeditlocation', strict_slash=True),
+    RedirectRoute('/story.deletelocation/<storyid>/<locationindex>', handlers.StoryDeleteLocationHandler, name='storydeletelocation', strict_slash=True),
     RedirectRoute('/trip/<storyid>', handlers.TripHandler, name='trip', strict_slash=True),
     RedirectRoute('/explore/', handlers.ExploreHandler, name='explore', strict_slash=True),
     RedirectRoute('/search/', handlers.SearchHandler, name='search', strict_slash=True),

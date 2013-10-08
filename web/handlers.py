@@ -94,10 +94,17 @@ class StoryEditHandler(JSONHandler):
         story.desc = self.request.get('desc')
                
         self.print_json()        
-                
+    
+    
+class StoryDeleteHandler(JSONHandler):
+    
+    def post(self, storyid):  
+        story = m.Story.get_by_id(int(storyid))
+        story.key.delete()
+        self.print_json()          
 
 
-class StoryDetail(JSONHandler):
+class StoryDetailHandler(JSONHandler):
     
     def post(self, storyid):
         story = m.Story.get_by_id(int(storyid))
@@ -139,10 +146,10 @@ class StoryEditLocationHandler(JSONHandler):
         
         target_location = None
                 
-        for loc in story.locations:
+        for k, loc in enumerate(story.locations):
             if loc.locationindex == locationindex:
-                loc['name'] = self.request.get('name')
-                loc['desc'] = self.request.get('desc')
+                story.locations[k]['name'] = self.request.get('name')
+                story.locations[k]['desc'] = self.request.get('desc')
                 target_location = loc
                 break
         
@@ -151,8 +158,26 @@ class StoryEditLocationHandler(JSONHandler):
         
         self.msg.add_record('location', target_location)
         self.print_json()
-          
-    
+     
+
+class StoryDeleteLocationHandler(JSONHandler):
+    def post(self, storyid, locationindex):
+        
+        story = m.Story.get_by_id(int(storyid))
+        
+        # delete location
+        for k, loc in enumerate(story.locations):
+            if loc.locationindex == locationindex:
+                del story.locations[k]
+                break
+            
+        # update main coordinates
+        for loc in story.locations:
+            story.latitude = loc['latitude']
+            story.longitude = loc['longitude']
+
+        story.put()
+        self.print_json()
 class TripHandler(BaseHandler):
     
     #@user_required
