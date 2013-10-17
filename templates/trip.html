@@ -15,14 +15,27 @@
     		<div id="map-canvas"></div>
 		</div>
 		
-		<div class="col-md-6"><!-- Informations about selection -->
-			<!-- Name of the place -->
+		<div class="col-md-6">
+			<!-- ID of the trip -->
+			<input type="hidden" id="storyId" value="{{ story.id }}"/>
+		
+			<!-- Name of the trip -->
 			<h3>{{ story.name }}</h3>
 			
+			<div class="btn-group">
+				<button id="buttonEditStory" type="button" class="btn btn-default btn-xs">
+					<span class="glyphicon glyphicon-pencil"></span> Edit
+				</button>
+				<button id="buttonDeleteStory" type="button" class="btn btn-default btn-xs">
+					<span class="glyphicon glyphicon-remove"></span> Delete
+				</button>
+			</div>
+			<br/><br/>
+
 			<!-- Custom description -->
 			<p>{{ story.desc }}</p>
 			
-			<hr />
+			<hr /><!-- Informations about selection -->
 			<h4 id="locName">Jagalchi Market</h4>
 			<!-- Custom description -->
 			<p id="locDesc">The best fishmarket I've ever been to</p>
@@ -98,6 +111,55 @@
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
     
+    <!-- Modal to edit the story -->
+    <div id="modalEditStory" class="modal fade">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title">Edit your story</h4>
+	      </div>
+	      <div class="modal-body">
+	        <form class="form-horizontal" role="form">
+	        	<div id="modalError"></div>
+				<!-- Name -->
+		        <div class="form-group">
+					<label for="inputNameStory" class="col-lg-2 control-label">Name</label>
+					<div class="col-lg-10">
+			    		<input class="form-control" type="text" id="inputNameStory" value="{{ story.name }}">
+					</div>
+				</div>
+			  
+				<!-- Dates of the trip -->
+			  	<div class="form-group">
+			  		<label for="dateBeginStory" class="col-lg-2 control-label">From</label>
+			  		<div class="col-lg-10">
+			  			<input id="dateBeginStory" class="form-control datepicker" type="text" />
+			  		</div>
+			  	</div>
+			  	<div class="form-group">
+			  		<label for="dateEndStory" class="col-lg-2 control-label">To</label>
+			  		<div class="col-lg-10">
+				  		<input id="dateEndStory" class="form-control datepicker" type="text"/>
+					</div>
+			  	</div>
+			  
+			    <!-- Description -->
+		        <div class="form-group">
+				    <label for="inputDescStory" class="col-lg-2 control-label">Description</label>
+				    <div class="col-lg-10">
+				    	<textarea class="form-control" type="text" id="inputDescStory" rows="3" placeholder="A few words about the trip...">{{ story.desc }}</textarea>
+				    </div>
+			    </div>
+	        </form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" id="buttonCancel" data-dismiss="modal">Cancel</button>
+	        <button type="button" class="btn btn-primary" id="editStory">Create</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+    
 {% endblock %}
 
 {% block mediaJS %}
@@ -116,6 +178,11 @@
     			$('#picturesUpload').append('<div class="form-group"><label for="inputFile" class="col-lg-2 control-label"></label><div class="col-lg-10"><input type="file" id="inputFile"><p class="help-block"></p></div></div>');
     		});
 
+			// Edit story
+			$('#buttonEditStory').click(function() {
+				$('#modalEditStory').modal('show');
+			});
+			
   			var map = new google.maps.Map(document.getElementById('map-canvas'), {
     			mapTypeId: google.maps.MapTypeId.ROADMAP,
     			zoom: 7
@@ -169,14 +236,7 @@
       			bounds.extend(place.geometry.location);
     		}
 
-
-		
-			
     		map.fitBounds(bounds);
-    		
-    		
-    		
-			
   		});
 	
   		google.maps.event.addListener(map, 'bounds_changed', function() {
@@ -270,7 +330,6 @@
 				
 		});
 	}
-
 
 	google.maps.event.addDomListener(window, 'load', initialize);
     </script>
