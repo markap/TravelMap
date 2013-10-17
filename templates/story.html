@@ -31,73 +31,8 @@
     	</tbody>
     </table>
     
-    <!-- Modal to create a new story -->
-    <div id="modalCreate" class="modal fade">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h4 class="modal-title">New trip story</h4>
-	      </div>
-	      <div class="modal-body">
-	        <form class="form-horizontal" role="form">
-	        	<div id="modalError"></div>
-				<!-- Name -->
-		        <div class="form-group">
-					<label for="inputName" class="col-lg-2 control-label">Name</label>
-					<div class="col-lg-10">
-			    		<input class="form-control" type="text" id="inputName" placeholder="Name of your trip">
-					</div>
-				</div>
-			  
-				<!-- Dates of the trip -->
-			  	<div class="form-group">
-			  		<label for="dateBegin" class="col-lg-2 control-label">From</label>
-			  		<div class="col-lg-10">
-			  			<input id="dateBegin" class="form-control datepicker" type="text" />
-			  		</div>
-			  	</div>
-			  	<div class="form-group">
-			  		<label for="dateEnd" class="col-lg-2 control-label">To</label>
-			  		<div class="col-lg-10">
-				  		<input id="dateEnd" class="form-control datepicker" type="text"/>
-					</div>
-			  	</div>
-			  
-			    <!-- Description -->
-		        <div class="form-group">
-				    <label for="inputDesc" class="col-lg-2 control-label">Description</label>
-				    <div class="col-lg-10">
-				    	<textarea class="form-control" type="text" id="inputDesc" rows="3" placeholder="A few words about the trip..."></textarea>
-				    </div>
-			    </div>
-	        </form>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" id="buttonCancel" data-dismiss="modal">Cancel</button>
-	        <button type="button" class="btn btn-primary" id="createStory">Create</button>
-	      </div>
-	    </div><!-- /.modal-content -->
-	  </div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
-
-    <!-- Modal to delete a story -->
-    <div id="modalDelete" class="modal fade">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h4 class="modal-title">Delete a story</h4>
-	      </div>
-	      <div class="modal-body">
-	      	<input id="idStoryDelete" type="hidden" />
-			<p>Are you sure to delete this story and all related contents ?</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-	        <button type="button" class="btn btn-primary" id="deleteStory">Confirm</button>
-	      </div>
-	    </div><!-- /.modal-content -->
-	  </div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
+    {% include "modalCreateStory.html" %}
+    {% include "modalDeleteStory.html" %}
 	
 {% endblock %}
 
