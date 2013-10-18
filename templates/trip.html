@@ -18,6 +18,8 @@
 		<div class="col-md-6">
 			<!-- ID of the trip -->
 			<input type="hidden" id="storyId" value="{{ story.id }}"/>
+			<input type="hidden" id="dateTo" value="{{ story.dateto }}"/>
+			<input type="hidden" id="dateFrom" value="{{ story.datefrom }}"/>
 		
 			<!-- Name of the trip -->
 			<h3>{{ story.name }}</h3>
@@ -113,8 +115,16 @@
 
 			// Edit story
 			$('#buttonEditStory').click(function() {
+				var datefrom = $('#dateFrom').val();
+				var dateto = $('#dateTo').val();
+				//TODO format is yyyy-mm-dd
+				$('#dateBeginStory').datepicker('setValue', '07/10/2013');
+				$('#dateEndStory').datepicker('setValue', '10/10/2013');
+
 				$('#modalEditStory').modal('show');
 			});
+
+			
 			
 			// Edit location
 			$('#buttonEditLocation').click(function() {

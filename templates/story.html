@@ -11,27 +11,39 @@
 {% endblock %}
 
 {% block content %}
-    <button id="buttonCreate" type="button" class="btn btn-primary">
-	    <span class="glyphicon glyphicon-plus"></span> Create a new trip
-    </button>
-    <br/><br/>
-    
-    <!-- List of the stories -->
-    <table class="table table-hover">
-	    <tbody>
-			{% for story in stories %}
-			    <tr id="{{story.id}}" class="story">
-			  		<td>{{ story.name }}</td>
-			  		<td>
-			  			<a href="/trip/{{ story.id }}">View story</a>
-			  		</td>
-			  		<td>
-			  			<button onClick="openDeleteModal({{story.id}});">Delete story</button>
-			  		</td>
-			  	</tr>
-			{% endfor %}
-    	</tbody>
-    </table>
+    <div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-body">
+			<button id="buttonCreate" type="button" class="btn btn-primary">
+	 		   <span class="glyphicon glyphicon-plus"></span> Create a new trip
+	   		</button>
+		</div>
+		<!-- List of the stories -->
+	    <table class="table table-hover">
+		    <tbody>
+				{% for story in stories %}
+				    <tr id="{{story.id}}" class="story">
+				  		<td>{{ story.name }}</td>
+				  		<td>
+				  			<a href="/trip/{{ story.id }}" class="btn btn-default btn-small">
+					  			<span class="glyphicon glyphicon-map-marker"></span> View story
+				  			</a>
+				  		</td>
+				  		<td>
+				  			<button class="btn btn-default btn-small">
+				  				<span class="glyphicon glyphicon-pencil"></span> Edit story
+				  			</button>
+				  		</td>
+				  		<td>
+				  			<button class="btn btn-default btn-small" onClick="openDeleteModal({{story.id}});">
+				  			<span class="glyphicon glyphicon-remove"></span> Delete story
+				  			</button>
+				  		</td>
+				  	</tr>
+				{% endfor %}
+	    	</tbody>
+	    </table>
+	</div>
     
     {% include "modalCreateStory.html" %}
     {% include "modalDeleteStory.html" %}
