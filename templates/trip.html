@@ -107,7 +107,6 @@
 		}
     
 		function initialize() {
-			$.ajax
 			// Add new pictures
     		$('#buttonMore').click(function(){
     			$('#picturesUpload').append('<div class="form-group"><label for="inputFile" class="col-lg-2 control-label"></label><div class="col-lg-10"><input type="file" id="inputFile"><p class="help-block"></p></div></div>');
@@ -124,11 +123,9 @@
 				$('#modalEditStory').modal('show');
 			});
 
-			
-			
 			// Edit location
 			$('#buttonEditLocation').click(function() {
-			
+				$('#modalEditLocation').modal('show');
 			});
 			
 			// Delete location
@@ -215,32 +212,34 @@
 			} 
 		}
 		
+		// Function to place a green saved marker on the map
+		function placeSavedMarker(loc) {
+			var marker = new google.maps.Marker({
+      			map: map,
+      			locationindex: loc.locationindex,
+       			icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+       			position: new google.maps.LatLng(loc.latitude, loc.longitude),
+     		});
+      			
+   			google.maps.event.addListener(marker, 'click', (function(m) {
+   				return function() {
+   				    // loc = get_location_for_index(m.locationindex);
+   				    
+   				    if (loc != null) {
+   				    	$('#locName').text(loc.name);
+   				    	$('#locDesc').text(loc.desc);
+   				    }
+   				};
+			})(marker)); 
+		}
+		
 		function updateMarkers(data) {
 			global_locations = data.record.locations;
 			for (var i = 0; i < global_locations.length; i++) {
 				loc = global_locations[i];
-			
-				var marker = new google.maps.Marker({
-       				map: map,
-       				locationindex: loc.locationindex,
-        			icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        			position: new google.maps.LatLng(loc.latitude, loc.longitude),
-      			});
-      			
-      			google.maps.event.addListener(marker, 'click', (function(m) {
-      				return function() {
-      				    loc = get_location_for_index(m.locationindex);
-      				    
-      				    if (loc != null) {
-      				    	      				    	
-      				    	$('#locName').text(loc.name);
-      				    	$('#locDesc').text(loc.desc);
-      				    	
-      				    }
-      				};
-				})(marker)); 
+				placeSavedMarker(loc);			
 			}
-		}
+		} // --- updateMarkers
 		
 		var clickMarker;
 
@@ -261,6 +260,10 @@
 			latestPosition = {'latitude': event.latLng.lat(),
 							   'longitude': event.latLng.lng()
 							   };
+			// Remove previous marker that havent been saved
+			if(clickMarker) {
+				clickMarker.setMap(null);
+			}
   			placeMarker(event.latLng);
 		});
 		
@@ -281,7 +284,12 @@
 	  				url: '/story.addlocation/' + {{ story.id }},
 	  				data: data
 				}).done(function(data){
-					updateMarkers(data);
+					// Remove temporary red marker
+					clickMarker.setMap(null);
+					
+					// Place new marker
+					var newLocation = data.record.location;
+					placeSavedMarker(newLocation);
 				});			
 			} else {
 				// TODO : error message in the modal
