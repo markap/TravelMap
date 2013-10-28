@@ -7,11 +7,12 @@
 	      <div class="modal-body">
 	        <form class="form-horizontal" role="form">
 	        	<div id="modalError"></div>
+	        	<input type="hidden" id="idStoryEdit"/>
 				<!-- Name -->
 		        <div class="form-group">
 					<label for="inputNameStory" class="col-lg-2 control-label">Name</label>
 					<div class="col-lg-10">
-			    		<input class="form-control" type="text" id="inputNameStory" value="{{ story.name }}">
+			    		<input class="form-control" type="text" id="inputNameStory">
 					</div>
 				</div>
 			  
@@ -33,7 +34,7 @@
 		        <div class="form-group">
 				    <label for="inputDescStory" class="col-lg-2 control-label">Description</label>
 				    <div class="col-lg-10">
-				    	<textarea class="form-control" type="text" id="inputDescStory" rows="3" placeholder="A few words about the trip...">{{ story.desc }}</textarea>
+				    	<textarea class="form-control" type="text" id="inputDescStory" rows="3" placeholder="A few words about the trip..."></textarea>
 				    </div>
 			    </div>
 	        </form>

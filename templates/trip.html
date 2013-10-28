@@ -20,6 +20,8 @@
 			<input type="hidden" id="storyId" value="{{ story.id }}"/>
 			<input type="hidden" id="dateTo" value="{{ story.dateto }}"/>
 			<input type="hidden" id="dateFrom" value="{{ story.datefrom }}"/>
+			<input type="hidden" id="storyName" value="{{ story.name }}"/>
+			<input type="hidden" id="storyDesc" value="{{ story.desc }}"/>
 		
 			<!-- Name of the trip -->
 			<h3>{{ story.name }}</h3>
@@ -119,6 +121,14 @@
 				//TODO format is yyyy-mm-dd
 				$('#dateBeginStory').datepicker('setValue', '07/10/2013');
 				$('#dateEndStory').datepicker('setValue', '10/10/2013');
+
+				var id = $('#storyId').val();
+				var name = $('#storyName').val();
+				var desc = $('#storyDesc').val();
+	
+				$('#idStoryEdit').val(id);
+				$('#inputNameStory').val(name);
+				$('#inputDescStory').val(desc);
 
 				$('#modalEditStory').modal('show');
 			});

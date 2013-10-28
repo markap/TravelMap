@@ -22,20 +22,26 @@
 	    <table class="table table-hover">
 		    <tbody>
 				{% for story in stories %}
-				    <tr id="{{story.id}}" class="story">
-				  		<td>{{ story.name }}</td>
+				    <tr id="{{ story.id }}" class="story">
+				  		<td>
+				  			{{ story.name }}
+				  			<input type="hidden" class="story_name" value="{{ story.name }}" />
+				  			<input type="hidden" class="story_desc" value="{{ story.desc }}" />
+				  			<input type="hidden" class="story_datefrom" value="{{ story.datefrom }}" />
+				  			<input type="hidden" class="story_dateto" value="{{ story.dateto }}" />
+				  		</td>
 				  		<td>
 				  			<a href="/trip/{{ story.id }}" class="btn btn-default btn-small">
 					  			<span class="glyphicon glyphicon-map-marker"></span> View story
 				  			</a>
 				  		</td>
 				  		<td>
-				  			<button class="btn btn-default btn-small">
+				  			<button class="btn btn-default btn-small" onClick="openEditModal({{ story.id }});">
 				  				<span class="glyphicon glyphicon-pencil"></span> Edit story
 				  			</button>
 				  		</td>
 				  		<td>
-				  			<button class="btn btn-default btn-small" onClick="openDeleteModal({{story.id}});">
+				  			<button class="btn btn-default btn-small" onClick="openDeleteModal({{ story.id }});">
 				  			<span class="glyphicon glyphicon-remove"></span> Delete story
 				  			</button>
 				  		</td>
@@ -47,14 +53,32 @@
     
     {% include "modalCreateStory.html" %}
     {% include "modalDeleteStory.html" %}
+    {% include "modalEditStory.html" %}
 	
 {% endblock %}
 
 {% block mediaJS %}
     <script>
     function openDeleteModal(idStory) {
-    	$('#modalDelete').modal('show');
+    	$('#modalDeleteStory').modal('show');
     	$('#idStoryDelete').val(idStory);
+   	}
+    
+    function openEditModal(idStory) {
+  		var datefrom = $('#'+idStory+' .story_datefrom').val();
+		var dateto = $('#'+idStory+' .story_dateto').val();
+		//TODO format is yyyy-mm-dd
+		$('#dateBeginStory').datepicker('setValue', '07/10/2013');
+		$('#dateEndStory').datepicker('setValue', '10/10/2013');
+
+		var name = $('#'+idStory+' .story_name').val();
+		var desc = $('#'+idStory+' .story_desc').val();
+
+		$('#idStoryEdit').val(idStory);
+		$('#inputNameStory').val(name);
+		$('#inputDescStory').val(desc);
+  
+   	  	$('#modalEditStory').modal('show');
    	}
     
     $().ready(function() {
@@ -131,7 +155,7 @@
 		// ----- Delete a story ----- //
 		$('#deleteStory').click(function(){
 			var idStory = $('#idStoryDelete').val();
-			$('#modalDelete').modal('hide');
+			$('#modalDeleteStory').modal('hide');
 			if(idStory) {
 		  		$.ajax({
 					type: "POST",
