@@ -159,8 +159,7 @@
 			if(idStory) {
 		  		$.ajax({
 					type: "POST",
-					url: '/story.delete/'+idStory
-					//data: {'storyid': idStory}
+					url: '/story.delete/' + idStory
 				})
 				.done(function(data){
 					if(data.status == "OK") {
@@ -169,6 +168,27 @@
 					}
 				});
 			}
+		});
+		
+		// ----- Edit a story ----- //
+		$('#editStory').click(function(){
+			var idStory = $('#idStoryEdit').val();
+			
+			//TODO : controls
+			$('#modalEditStory').modal('hide');
+			$.ajax({
+				type: "POST",
+				url: '/story.edit/' + idStory,
+				data: {'name' : $('#inputNameStory').val(),
+						'desc' : $('#inputDescStory').val(),
+						'dateto' : $('#dateBeginStory').val(),
+						'datefrom' : $('#dateEndStory').val()}
+			})
+			.done(function(data){
+				if(data.status == "OK") {
+					// Erase the trip from the list
+				}
+			});
 		});
 	});
 	</script>
