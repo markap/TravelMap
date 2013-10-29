@@ -37,49 +37,56 @@
 			<p>{{ story.desc }}</p>
 			
 			<hr /><!-- Informations about selection -->
-			<h4 id="locName">Jagalchi Market</h4>
 			
-			<!-- Actions on location -->
-			<div class="btn-group">
-				<button id="buttonEditLocation" type="button" class="btn btn-default btn-xs">
-					<span class="glyphicon glyphicon-pencil"></span> Edit
-				</button>
-				<button id="buttonDeleteLocation" type="button" class="btn btn-default btn-xs">
-					<span class="glyphicon glyphicon-remove"></span> Delete
-				</button>
+			<div id="noSelection">
+				<p>Please select a location, or create a new one by using the map.</p>
 			</div>
-			<br/><br/>
-		
-			<!-- Custom description -->
-			<p id="locDesc">The best fishmarket I've ever been to</p>
-			<!-- Wikipedia description -->
-			<p><img src="/img/wiki.png" alt="Wiki">
-			<em><small>
-			Jagalchi Fish Market is a fish market in the neighborhood of Nampo-dong in Jung-gu, and Chungmu-dong, Seo-gu, Busan, South Korea.[1] The market is located on the edge of Nampo Port, Busan. The name is said to have originated from jagal (gravel in Korean) because the market used to be surrounded by many gravels.[2] This is one of the ten landmarks of Busan, so many tourists visit there to shop.
-			</small></em></p>
 			
-			<!-- Upload pictures -->
-			<button id="buttonUploadPictures" type="button" class="btn btn-default btn-xs">
-				<span class="glyphicon glyphicon-picture"></span> Upload pictures
-			</button>
-			<br/><br/>
+			<div id="selectionInfos" style="display: none;">
+				<input id="locIndex" type="hidden"/>
+				<h4 id="locName">Jagalchi Market</h4>
+				<!-- Actions on location -->
+				<div class="btn-group">
+					<button id="buttonEditLocation" type="button" class="btn btn-default btn-xs">
+						<span class="glyphicon glyphicon-pencil"></span> Edit
+					</button>
+					<button id="buttonDeleteLocation" type="button" class="btn btn-default btn-xs">
+						<span class="glyphicon glyphicon-remove"></span> Delete
+					</button>
+				</div>
+				<br/><br/>
 			
-			<!-- Related pictures -->
-			<div class="row">
-				<div class="col-sm-6 col-md-3">
-					<a href="#" class="thumbnail">
-						<img src="/img/sample1.jpg" alt="Sample 1">
-					</a>
-				</div>
-				<div class="col-sm-6 col-md-3">
-					<a href="#" class="thumbnail">
-						<img src="/img/sample2.jpg" alt="Sample 2">
-					</a>
-				</div>
-				<div class="col-sm-6 col-md-3">
-					<a href="#" class="thumbnail">
-						<img src="/img/sample3.jpg" alt="Sample 3">
-					</a>
+				<!-- Custom description -->
+				<p id="locDesc">The best fishmarket I've ever been to</p>
+				<!-- Wikipedia description -->
+				<p><img src="/img/wiki.png" alt="Wiki">
+				<em><small>
+					<span id="wikipedia_desc">Jagalchi Fish Market is a fish market in the neighborhood of Nampo-dong in Jung-gu</span>
+				</small></em></p>
+				
+				<!-- Upload pictures -->
+				<button id="buttonUploadPictures" type="button" class="btn btn-default btn-xs">
+					<span class="glyphicon glyphicon-picture"></span> Upload pictures
+				</button>
+				<br/><br/>
+				
+				<!-- Related pictures -->
+				<div class="row">
+					<div class="col-sm-6 col-md-3">
+						<a href="#" class="thumbnail">
+							<img src="/img/sample1.jpg" alt="Sample 1">
+						</a>
+					</div>
+					<div class="col-sm-6 col-md-3">
+						<a href="#" class="thumbnail">
+							<img src="/img/sample2.jpg" alt="Sample 2">
+						</a>
+					</div>
+					<div class="col-sm-6 col-md-3">
+						<a href="#" class="thumbnail">
+							<img src="/img/sample3.jpg" alt="Sample 3">
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -90,6 +97,9 @@
     
     <!-- Modal to edit a location -->
     {% include "modalEditLocation.html" %}
+    
+    <!-- Modal to delete a location -->
+    {% include "modalDeleteLocation.html" %}
     
     <!-- Modal to edit the story -->
     {% include "modalEditStory.html" %}
@@ -129,6 +139,27 @@
 
 				$('#modalEditStory').modal('show');
 			});
+			
+			$('#editStory').click(function(){
+				var idStory = $('#idStoryEdit').val();
+			
+				//TODO : controls
+				$('#modalEditStory').modal('hide');
+				$.ajax({
+					type: "POST",
+					url: '/story.edit/' + idStory,
+					data: {'name' : $('#inputNameStory').val(),
+							'desc' : $('#inputDescStory').val(),
+							'dateto' : $('#dateBeginStory').val(),
+							'datefrom' : $('#dateEndStory').val()}
+				})
+				.done(function(data){
+					if(data.status == "OK") {
+						// Update trip data
+						
+					}
+				});
+			});
 
 			// Edit location
 			$('#buttonEditLocation').click(function() {
@@ -137,7 +168,27 @@
 			
 			// Delete location
 			$('#buttonDeleteLocation').click(function() {
+				$('#modalDeleteLocation').modal('show');
+			});
 			
+			$('#deleteLocation').click(function(){
+				$('#modalDeleteLocation').modal('hide');
+				var index = $('#locIndex').val();
+				if(index) {
+					$.ajax({
+						type: "POST",
+						url: '/story.deletelocation/' + $('#storyId').val() + '/' + index
+					})
+					.done(function(data){
+						if(data.status == "OK") {
+							// Erase marker
+							
+							// Display default message
+							$('#noSelection').css('display','inherit');
+							$('#selectionInfos').css('display','none');
+						}
+					});
+				}
 			});
 			
   			var map = new google.maps.Map(document.getElementById('map-canvas'), {
@@ -227,17 +278,23 @@
        			icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
        			position: new google.maps.LatLng(loc.latitude, loc.longitude),
      		});
-      			
+      		
    			google.maps.event.addListener(marker, 'click', (function(m) {
    				return function() {
    				    // loc = get_location_for_index(m.locationindex);
    				    
    				    if (loc != null) {
+						$('#locIndex').val(m.locationindex);
    				    	$('#locName').text(loc.name);
    				    	$('#locDesc').text(loc.desc);
+   				    	
+   				    	// Display infos and hide default message
+   				    	$('#noSelection').css("display","none");
+   				    	$('#selectionInfos').css("display","inherit");
    				    }
    				};
-			})(marker)); 
+			})(marker));
+			return marker;
 		}
 		
 		function updateMarkers(data) {
@@ -296,7 +353,12 @@
 					
 					// Place new marker
 					var newLocation = data.record.location;
-					placeSavedMarker(newLocation);
+					var marker = placeSavedMarker(newLocation);
+								
+					// Automatically focus on the marker
+					google.maps.event.trigger(marker, 'click', {
+						latLng: new google.maps.LatLng(0, 0)
+					});
 				});			
 			} else {
 				// TODO : error message in the modal
