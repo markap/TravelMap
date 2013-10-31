@@ -20,6 +20,8 @@ _routes = [
     RedirectRoute('/trip/<storyid>', handlers.TripHandler, name='trip', strict_slash=True),
     RedirectRoute('/explore/', handlers.ExploreHandler, name='explore', strict_slash=True),
     RedirectRoute('/search/', handlers.SearchHandler, name='search', strict_slash=True),
+    RedirectRoute('/google.search/', handlers.GoogleSearchHandler, name='googlesearch', strict_slash=True),
+    RedirectRoute('/wikipedia.search/', handlers.WikipediaHandler, name='wikisearch', strict_slash=True),
 ]
 
 def get_routes():
