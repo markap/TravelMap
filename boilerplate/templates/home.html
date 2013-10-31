@@ -5,30 +5,38 @@
 {% block content %}
 
     {% if user_id %}
-    <div class="hero-unit home_bp">
-		<h1>Tripstory - share your travel</h1>
-    
+    <div class="jumbotron home_bp">
+		<h1>Tripstory <small>Share your travel</small></h1>
         <p><b>
         {% trans %}Tripstory is your way to visualize and share your travel experience.<br/> 
                  It connects locations, information, images and videos in a simple way.{% endtrans %}</b>
         </p>
-        <p><a class="btn btn-lg btn-success" href="/explore">Explore</a></p>
+        <p>
+        	<a class="btn btn-lg btn-success" href="/explore">
+        	<span class="glyphicon glyphicon-globe"></span>
+        	Explore</a>
+        </p>
     </div>
     {% else %}
     <div class="row">
-        <div class="span9">
+        <div class="col-md-12">
             <div class="home_bp">
-               
-                <h1>Tripstory - share your travel</h1>
-    
+                <h1>Tripstory <small>Share your travel</small></h1>
                 <p><b>
                     {% trans %}Tripstory is your way to visualize and share your travel experience.<br/> 
                     It connects locations, information, images and videos in a simple way.{% endtrans %}</b>
                 </p>
-                <p><a class="btn btn-lg btn-success" href="/explore">Explore</a></p>
+                <p>
+                	<a class="btn btn-lg btn-success" href="/explore">
+                	<span class="glyphicon glyphicon-globe"></span>
+                	Explore</a>
+                </p>
             </div>
         </div>
-        <div class="span3 auth-at-home">
+        
+        <div class="auth-at-home">
+        	<div class="col-md-6">
+            <h3>{% trans %}Sign In{% endtrans %}</h3>
             <form id="form_login_user" action="{{ uri_for("login") }}" method="post">
                 <fieldset class="well">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -39,10 +47,10 @@
                     </div>
                     <div class="control-group">
                         <div class="controls row-fluid">
-                            <label class="span8">
+                            <label>
                                 <input class="focused required form-control" name="password" id="l_password" type="password" placeholder="{% trans %}Password{% endtrans %}">
                             </label>
-                            <label class="span4">
+                            <label>
                                 <button type="submit" class="btn btn-primary btn-login">{% trans %}Login{% endtrans %}</button>
                             </label>
                         </div>
@@ -57,7 +65,9 @@
               
                 </fieldset>
             </form>
+            </div>
 
+			<div class="col-md-6">
             <h3>{% trans %}Sign Up{% endtrans %}</h3>
             <form id="form_register" action="{{ uri_for("register") }}" method="post">
                 <fieldset class="well">
@@ -90,6 +100,7 @@
                     </div>
                 </fieldset>
             </form>
+            </div>
         </div>
     </div><!-- /row -->
     {% endif %}

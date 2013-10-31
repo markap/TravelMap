@@ -11,77 +11,78 @@
 {% endblock %}
 
 {% block content %}
-    <button id="buttonCreate" type="button" class="btn btn-primary">Create a new trip</button>
-    <br/><br/>
+    <div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-body">
+			<button id="buttonCreate" type="button" class="btn btn-primary">
+	 		   <span class="glyphicon glyphicon-plus"></span> Create a new trip
+	   		</button>
+		</div>
+		<!-- List of the stories -->
+	    <table class="table table-hover">
+		    <tbody>
+				{% for story in stories %}
+				    <tr id="{{ story.id }}" class="story">
+				  		<td>
+				  			{{ story.name }}
+				  			<input type="hidden" class="story_name" value="{{ story.name }}" />
+				  			<input type="hidden" class="story_desc" value="{{ story.desc }}" />
+				  			<input type="hidden" class="story_datefrom" value="{{ story.datefrom }}" />
+				  			<input type="hidden" class="story_dateto" value="{{ story.dateto }}" />
+				  		</td>
+				  		<td>
+				  			<a href="/trip/{{ story.id }}" class="btn btn-default btn-small">
+					  			<span class="glyphicon glyphicon-map-marker"></span> View story
+				  			</a>
+				  		</td>
+				  		<td>
+				  			<button class="btn btn-default btn-small" onClick="openEditModal({{ story.id }});">
+				  				<span class="glyphicon glyphicon-pencil"></span> Edit story
+				  			</button>
+				  		</td>
+				  		<td>
+				  			<button class="btn btn-default btn-small" onClick="openDeleteModal({{ story.id }});">
+				  			<span class="glyphicon glyphicon-remove"></span> Delete story
+				  			</button>
+				  		</td>
+				  	</tr>
+				{% endfor %}
+	    	</tbody>
+	    </table>
+	</div>
     
-    <!-- List of the stories -->
-    <table class="table table-hover">
-	    <tbody>
-			{% for story in stories %}
-			    <tr>
-			  		<td>{{ story.name }}</td>
-			  		<td>
-			  			<a href="/trip/{{ story.id }}">View story</a>
-			  		</td>
-			  	</tr>
-			{% endfor %}
-    	</tbody>
-    </table>
-    
-    <!-- Modal to create a new story -->
-    <div id="modalCreate" class="modal fade">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h4 class="modal-title">New trip story</h4>
-	      </div>
-	      <div class="modal-body">
-	        <form class="form-horizontal" role="form">
-	        	<div id="modalError"></div>
-				<!-- Name -->
-		        <div class="form-group">
-					<label for="inputName" class="col-lg-2 control-label">Name</label>
-					<div class="col-lg-10">
-			    		<input class="form-control" type="text" id="inputName" placeholder="Name of your trip">
-					</div>
-				</div>
-			  
-				<!-- Dates of the trip -->
-			  	<div class="form-group">
-			  		<label for="dateBegin" class="col-lg-2 control-label">From</label>
-			  		<div class="col-lg-10">
-			  			<input id="dateBegin" class="form-control datepicker" type="text" />
-			  		</div>
-			  	</div>
-			  	<div class="form-group">
-			  		<label for="dateEnd" class="col-lg-2 control-label">To</label>
-			  		<div class="col-lg-10">
-				  		<input id="dateEnd" class="form-control datepicker" type="text"/>
-					</div>
-			  	</div>
-			  
-			    <!-- Description -->
-		        <div class="form-group">
-				    <label for="inputDesc" class="col-lg-2 control-label">Description</label>
-				    <div class="col-lg-10">
-				    	<textarea class="form-control" type="text" id="inputDesc" rows="3" placeholder="A few words about the trip..."></textarea>
-				    </div>
-			    </div>
-	        </form>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" id="buttonCancel" data-dismiss="modal">Cancel</button>
-	        <button type="button" class="btn btn-primary" id="createStory">Create</button>
-	      </div>
-	    </div><!-- /.modal-content -->
-	  </div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
+    {% include "modalCreateStory.html" %}
+    {% include "modalDeleteStory.html" %}
+    {% include "modalEditStory.html" %}
 	
 {% endblock %}
 
 {% block mediaJS %}
     <script>
+    function openDeleteModal(idStory) {
+    	$('#modalDeleteStory').modal('show');
+    	$('#idStoryDelete').val(idStory);
+   	}
+    
+    function openEditModal(idStory) {
+  		var datefrom = $('#'+idStory+' .story_datefrom').val();
+		var dateto = $('#'+idStory+' .story_dateto').val();
+		//TODO format is yyyy-mm-dd
+		$('#dateBeginStory').datepicker('setValue', '07/10/2013');
+		$('#dateEndStory').datepicker('setValue', '10/10/2013');
+
+		var name = $('#'+idStory+' .story_name').val();
+		var desc = $('#'+idStory+' .story_desc').val();
+
+		$('#idStoryEdit').val(idStory);
+		$('#inputNameStory').val(name);
+		$('#inputDescStory').val(desc);
+  
+   	  	$('#modalEditStory').modal('show');
+   	}
+    
     $().ready(function() {
+		// ----- Create a story ----- //    
 		$('#buttonCreate').click(function() {
 			$('#modalCreate').modal('show');
 		});
@@ -151,6 +152,44 @@
 		  dateEnd.hide();
 		}).data('datepicker');
 
+		// ----- Delete a story ----- //
+		$('#deleteStory').click(function(){
+			var idStory = $('#idStoryDelete').val();
+			$('#modalDeleteStory').modal('hide');
+			if(idStory) {
+		  		$.ajax({
+					type: "POST",
+					url: '/story.delete/' + idStory
+				})
+				.done(function(data){
+					if(data.status == "OK") {
+						// Erase the trip from the list
+						$('#'+idStory).remove();
+					}
+				});
+			}
+		});
+		
+		// ----- Edit a story ----- //
+		$('#editStory').click(function(){
+			var idStory = $('#idStoryEdit').val();
+			
+			//TODO : controls
+			$('#modalEditStory').modal('hide');
+			$.ajax({
+				type: "POST",
+				url: '/story.edit/' + idStory,
+				data: {'name' : $('#inputNameStory').val(),
+						'desc' : $('#inputDescStory').val(),
+						'dateto' : $('#dateBeginStory').val(),
+						'datefrom' : $('#dateEndStory').val()}
+			})
+			.done(function(data){
+				if(data.status == "OK") {
+					// Erase the trip from the list
+				}
+			});
+		});
 	});
 	</script>
 {% endblock %}
