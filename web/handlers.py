@@ -10,14 +10,17 @@
 """
 import httpagentparser
 from google.appengine.ext import ndb
+from google.appengine.api import urlfetch
 
 from boilerplate import models
 from boilerplate.lib.basehandler import BaseHandler, JSONHandler
 from boilerplate.lib.decorators import user_required
 
 from datetime import datetime
+import json
+import wiki2plain, wikipedia
 
-from web import models as m, parser
+from web import models as m, parser, wiki2plain
 
 
 
@@ -89,8 +92,8 @@ class StoryEditHandler(JSONHandler):
         datefrom = self.request.get('datefrom')
         
         story.name = self.request.get('name')
-        story.dateto = datetime.strptime(dateto, '%d/%m/%Y'),
-        story.datefrom = datetime.strptime(datefrom, '%d/%m/%Y'),
+        story.dateto = datetime.strptime(dateto, '%d/%m/%Y')
+        story.datefrom = datetime.strptime(datefrom, '%d/%m/%Y')
         story.desc = self.request.get('desc')
                
         self.print_json()        
@@ -159,6 +162,59 @@ class StoryEditLocationHandler(JSONHandler):
         self.msg.add_record('location', target_location)
         self.print_json()
      
+
+class GoogleSearchHandler(JSONHandler):
+    def post(self):
+        text = self.request.get('location')
+        text = "busan"
+        
+        url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyBVGHr3UpamcOQkLPP7guMalOZ0l2VZO6k&cx=006720223612486791407:aet3a3qxagc&q=%s" % text
+        result = urlfetch.fetch(url)
+        if result.status_code == 200:
+            links = []
+            j = json.loads(result.content)
+            print j['items']
+            self.response.out.write(type(j))
+            for content in j['items']:
+                
+                if ".jpg" not in content['link'].lower() or ".png" not in content['link'].lower():
+                    links.append({'title': content['title'], 
+                                  'link': content['link'].split('/')[-1]})
+                 
+            self.msg.add_record('content', links)
+            
+        self.print_json()
+        
+    def get(self):
+        self.post()
+        
+        
+class WikipediaHandler(JSONHandler):
+    def post(self):
+        
+        url = self.request.get('url')
+        url = "Busan"
+        
+        
+        wiki = wikipedia.Wikipedia('en')
+
+        try:
+            raw = wiki.article(url)
+        except:
+            raw = None
+        
+        if raw:
+            wiki2plain_ = wiki2plain.Wiki2Plain(raw)
+            content = wiki2plain_.unwiki(wiki2plain_.text).split("==")[0]
+            self.msg.add_record("wiki", content)
+            
+        self.print_json()
+    
+    
+    
+    def get(self):
+        self.post()
+
 
 class StoryDeleteLocationHandler(JSONHandler):
     def post(self, storyid, locationindex):
