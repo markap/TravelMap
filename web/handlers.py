@@ -95,6 +95,7 @@ class StoryEditHandler(JSONHandler):
         story.dateto = datetime.strptime(dateto, '%d/%m/%Y')
         story.datefrom = datetime.strptime(datefrom, '%d/%m/%Y')
         story.desc = self.request.get('desc')
+        story.put()
                
         self.print_json()        
     
