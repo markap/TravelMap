@@ -145,13 +145,14 @@ class StoryAddLocationHandler(JSONHandler):
 class StoryEditLocationHandler(JSONHandler):
     
     #@user_required
-    def post(self, storyid, locationindex):
+    def get(self, storyid, locationindex):
         story = m.Story.get_by_id(int(storyid))
         
         target_location = None
                 
         for k, loc in enumerate(story.locations):
-            if loc['locationindex'] == locationindex:
+            if loc['locationindex'] == int(locationindex):
+                self.msg.add_record(k, locationindex)
                 story.locations[k]['name'] = self.request.get('name')
                 story.locations[k]['desc'] = self.request.get('desc')
                 target_location = loc
@@ -162,6 +163,8 @@ class StoryEditLocationHandler(JSONHandler):
         
         self.msg.add_record('location', target_location)
         self.print_json()
+        
+    
      
 
 class GoogleSearchHandler(JSONHandler):
@@ -224,7 +227,7 @@ class StoryDeleteLocationHandler(JSONHandler):
         
         # delete location
         for k, loc in enumerate(story.locations):
-            if loc.locationindex == locationindex:
+            if loc['locationindex'] == int(locationindex):
                 del story.locations[k]
                 break
             
