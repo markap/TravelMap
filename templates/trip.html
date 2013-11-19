@@ -112,6 +112,7 @@
     <script>
     	// Open modal to create a new location
 		function openModal() {
+			$('#modalCreateLocation').modal({ backdrop: 'static', keyboard: false });
 			$('#modalCreateLocation').modal('show');
 			// Clear previous data
 			$('#locationInputName').val('');
@@ -416,8 +417,6 @@
 		$('#addLocation').click(function() {
 			var locName = $('#locationInputName').val();
 			if(locName) {
-				$('#modalCreateLocation').modal('hide');
-			
 				data = {'name': $('#locationInputName').val(),
 						'desc': $('#locationInputDesc').val(),
 						'latitude': latestPosition.latitude,
@@ -433,6 +432,13 @@
 					clickMarker.setMap(null);
 					
 					/// TEST
+					// Change the layout
+					$('#wikiLayout').css('display','inherit');
+					$('#locationLayout').css('display','none');
+					$('#addLocation').css('display','none');
+					$('#addLocationCancel').css('display','none');
+					$('#addLocationFinal').css('display','inline');
+					
 					$.ajax({
 						type: "GET",
 						url: '/google.search',
@@ -440,7 +446,26 @@
 					}).done(function(data){
 						if(data.status == 'OK') {
 							var results = data.record.content;
-					
+							
+							// Empty previous data
+							$('#wikiList').empty();
+							
+							// Create an option for each link
+							for(i = 0 ; i < results.length ; i++) {
+								var content = results[i];
+								var title = content.title;
+								var link = content.link;
+								var radioButton = '<div class="radio"><label><input type="radio" name="optionsRadios" value="'
+								+ link + '">'+ title + '</label></div>';
+								$('#wikiList').append(radioButton);	
+							}
+							
+							//TODO
+							/*
+							Select the first by default
+							enable/disable input
+							Display description
+							*/
 						}
 					});
 					
@@ -459,6 +484,16 @@
 			} else {
 				// TODO : error message in the modal
 			}
+		}); // End addLocationClick
+		
+		$('#addLocationFinal').click(function(){
+			// Rechange the layout before hiding modal
+			$('#wikiLayout').css('display','none');
+			$('#locationLayout').css('display','inherit');
+			$('#addLocation').css('display','inline');
+			$('#addLocationCancel').css('display','inline');
+			$('#addLocationFinal').css('display','none');
+			$('#modalCreateLocation').modal('hide');
 		});
 	}
 
