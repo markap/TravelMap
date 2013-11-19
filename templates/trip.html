@@ -177,6 +177,11 @@
 
 			// Edit location
 			$('#buttonEditLocation').click(function() {
+				var locName = $('#locName').html();
+				var locDesc = $('#locDesc').html();
+				$('#locationInputNameEdit').val(locName);
+				$('#locationInputDescEdit').val(locDesc);
+				
 				$('#modalEditLocation').modal('show');
 			});
 			
@@ -184,7 +189,27 @@
 				$('#modalEditLocation').modal('hide');
 				var index = $('#locIndex').val();
 				if(index) {
-				
+					// TODO : controls
+					var name = $('#locationInputNameEdit').val();
+					var desc = $('#locationInputDescEdit').val();
+					var idStory = $('#storyId').val();
+					$.ajax({
+		  				type: "GET",
+		  				url: '/story.editlocation/' + idStory + '/' + index,
+		  				data: {'name': name,
+		  						'desc': desc}
+					})
+					.done(function(data) {
+						if(data.status == 'OK'){
+							// Close the modal
+							$('#modalEditLocation').modal('hide');
+							// Update data
+							global_locations[index].name = name;
+							global_locations[index].desc = desc;
+							$('#locName').html(name);
+							$('#locDesc').html(desc);
+						}
+					});
 				}
 			});
 			
@@ -192,6 +217,9 @@
 			$('#buttonDeleteLocation').click(function() {
 				$('#modalDeleteLocation').modal('show');
 			});
+
+			// Array of all the green markers
+			var savedMarkers = [];
 			
 			$('#deleteLocation').click(function(){
 				$('#modalDeleteLocation').modal('hide');
@@ -204,6 +232,11 @@
 					.done(function(data){
 						if(data.status == "OK") {
 							// Erase marker
+							var markerToDelete = savedMarkers[index];
+							if(markerToDelete) {
+								markerToDelete.setMap(null);
+							}
+							savedMarkers.splice(index, 1);
 							
 							// Display default message
 							$('#noSelection').css('display','inherit');
@@ -323,7 +356,8 @@
 			global_locations = data.record.locations;
 			for (var i = 0; i < global_locations.length; i++) {
 				loc = global_locations[i];
-				placeSavedMarker(loc);			
+				var marker = placeSavedMarker(loc);
+				savedMarkers.push(marker);			
 			}
 		} // --- updateMarkers
 		
@@ -376,6 +410,7 @@
 					// Place new marker
 					var newLocation = data.record.location;
 					var marker = placeSavedMarker(newLocation);
+					savedMarkers.push(marker);
 								
 					// Automatically focus on the marker
 					google.maps.event.trigger(marker, 'click', {
