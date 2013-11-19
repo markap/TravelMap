@@ -248,13 +248,8 @@
 							}
 							savedMarkers.splice(i, 1);
 							
-							/*
-							var markerToDelete = savedMarkers[index];
-							if(markerToDelete) {
-								markerToDelete.setMap(null);
-							}
-							savedMarkers.splice(index, 1);
-							*/
+							// Erase location
+							remove_location_for_index(index);
 							
 							// Display default message
 							$('#noSelection').css('display','inherit');
@@ -343,6 +338,16 @@
 			} 
 		}
 		
+		function remove_location_for_index(idx) {
+			for (var i = 0; i < global_locations.length; i++) {
+				loc = global_locations[i];
+				if (loc.locationindex == idx) {
+					global_locations.splice(i,1);
+					break;
+				}
+			} 
+		}
+		
 		// Function to place a green saved marker on the map
 		function placeSavedMarker(loc) {
 			var marker = new google.maps.Marker({
@@ -351,6 +356,9 @@
        			icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
        			position: new google.maps.LatLng(loc.latitude, loc.longitude),
      		});
+      		
+			var savedMarker = {marker: marker, index: loc.locationindex};
+			savedMarkers.push(savedMarker);
       		
    			google.maps.event.addListener(marker, 'click', (function(m) {
    				return function() {
@@ -374,9 +382,7 @@
 			global_locations = data.record.locations;
 			for (var i = 0; i < global_locations.length; i++) {
 				loc = global_locations[i];
-				var marker = placeSavedMarker(loc);
-				var savedMarker = {marker: marker, index: loc.locationindex};
-				savedMarkers.push(savedMarker);			
+				var marker = placeSavedMarker(loc);	
 			}
 		} // --- updateMarkers
 		
@@ -442,9 +448,8 @@
 					
 					// Place new marker and save it in the array
 					var newLocation = data.record.location;
+					global_locations.push(newLocation);
 					var marker = placeSavedMarker(newLocation);
-					var savedMarker = {marker: marker, index: newLocation.locationindex};
-					savedMarkers.push(savedMarker);
 								
 					// Automatically focus on the marker
 					google.maps.event.trigger(marker, 'click', {
