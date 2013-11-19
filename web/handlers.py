@@ -151,7 +151,7 @@ class StoryEditLocationHandler(JSONHandler):
         target_location = None
                 
         for k, loc in enumerate(story.locations):
-            if loc.locationindex == locationindex:
+            if loc['locationindex'] == locationindex:
                 story.locations[k]['name'] = self.request.get('name')
                 story.locations[k]['desc'] = self.request.get('desc')
                 target_location = loc
