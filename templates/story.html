@@ -24,7 +24,7 @@
 				{% for story in stories %}
 				    <tr id="{{ story.id }}" class="story">
 				  		<td>
-				  			{{ story.name }}
+				  			<span class="display_story_name">{{ story.name }}</span>
 				  			<input type="hidden" class="story_name" value="{{ story.name }}" />
 				  			<input type="hidden" class="story_desc" value="{{ story.desc }}" />
 				  			<input type="hidden" class="story_datefrom" value="{{ story.datefrom }}" />
@@ -176,18 +176,29 @@
 			
 			//TODO : controls
 			$('#modalEditStory').modal('hide');
+			
+			// Infos
+			var name = $('#inputNameStory').val();
+			var desc = $('#inputDescStory').val();
+			var dateto = $('#dateBeginStory').val();
+			var datefrom = $('#dateEndStory').val();
+			
 			$.ajax({
 				type: "POST",
 				url: '/story.edit/' + idStory,
-				data: {'name' : $('#inputNameStory').val(),
-						'desc' : $('#inputDescStory').val(),
-						'dateto' : $('#dateBeginStory').val(),
-						'datefrom' : $('#dateEndStory').val()}
+				data: {'name' : name,
+						'desc' : desc,
+						'dateto' : dateto,
+						'datefrom' : datefrom}
 			})
 			.done(function(data){
 				if(data.status == "OK") {
 					// Update trip data
-					
+					$('#' + idStory + ' .story_name').val(name);
+					$('#' + idStory + ' .story_desc').val(desc);
+					$('#' + idStory + ' .story_datefrom').val(datefrom);
+					$('#' + idStory + ' .story_dateto').val(dateto);
+					$('#' + idStory + ' .display_story_name').html(name);
 				}
 			});
 		});

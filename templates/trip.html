@@ -24,7 +24,7 @@
 			<input type="hidden" id="storyDesc" value="{{ story.desc }}"/>
 		
 			<!-- Name of the trip -->
-			<h3>{{ story.name }}</h3>
+			<h3 id="displayStoryName">{{ story.name }}</h3>
 			
 			<div class="btn-group">
 				<button id="buttonEditStory" type="button" class="btn btn-default btn-xs">
@@ -34,7 +34,7 @@
 			<br/><br/>
 
 			<!-- Custom description -->
-			<p>{{ story.desc }}</p>
+			<p id="displayStoryDesc">{{ story.desc }}</p>
 			
 			<hr /><!-- Informations about selection -->
 			
@@ -113,6 +113,9 @@
     	// Open modal to create a new location
 		function openModal() {
 			$('#modalCreateLocation').modal('show');
+			// Clear previous data
+			$('#locationInputName').val('');
+			$('#locationInputDesc').val('');
 		}
     
 		function initialize() {
@@ -145,18 +148,29 @@
 			
 				//TODO : controls
 				$('#modalEditStory').modal('hide');
+				
+				var name = $('#inputNameStory').val();
+				var desc = $('#inputDescStory').val();
+				var dateto = $('#dateBeginStory').val();
+				var datefrom = $('#dateEndStory').val();
+				
 				$.ajax({
 					type: "POST",
 					url: '/story.edit/' + idStory,
-					data: {'name' : $('#inputNameStory').val(),
-							'desc' : $('#inputDescStory').val(),
-							'dateto' : $('#dateBeginStory').val(),
-							'datefrom' : $('#dateEndStory').val()}
+					data: {'name' : name,
+							'desc' : desc,
+							'dateto' : dateto,
+							'datefrom' : datefrom}
 				})
 				.done(function(data){
 					if(data.status == "OK") {
 						// Update trip data
-						
+						$('#storyName').val(name);
+						$('#storyDesc').val(desc);
+						$('#dateTo').val(dateto);
+						$('#dateFrom').val(datefrom);
+						$('#displayStoryName').html(name);
+						$('#displayStoryDesc').html(desc);
 					}
 				});
 			});
