@@ -204,8 +204,10 @@
 							// Close the modal
 							$('#modalEditLocation').modal('hide');
 							// Update data
-							global_locations[index].name = name;
-							global_locations[index].desc = desc;
+							var loc = get_location_for_index(index);
+							loc.name = name;
+							loc.desc = desc;
+							
 							$('#locName').html(name);
 							$('#locDesc').html(desc);
 						}
@@ -220,7 +222,7 @@
 
 			// Array of all the green markers
 			var savedMarkers = [];
-			
+						
 			$('#deleteLocation').click(function(){
 				$('#modalDeleteLocation').modal('hide');
 				var index = $('#locIndex').val();
@@ -232,11 +234,27 @@
 					.done(function(data){
 						if(data.status == "OK") {
 							// Erase marker
+							var markerToDelete;
+							var i = 0;
+							for(i ; i < savedMarkers.length ; i++){
+								if( savedMarkers[i].index == index ) {
+									markerToDelete = savedMarkers[i].marker;
+									break;					
+								}
+							}
+							
+							if(markerToDelete) {
+								markerToDelete.setMap(null);
+							}
+							savedMarkers.splice(i, 1);
+							
+							/*
 							var markerToDelete = savedMarkers[index];
 							if(markerToDelete) {
 								markerToDelete.setMap(null);
 							}
 							savedMarkers.splice(index, 1);
+							*/
 							
 							// Display default message
 							$('#noSelection').css('display','inherit');
@@ -357,7 +375,8 @@
 			for (var i = 0; i < global_locations.length; i++) {
 				loc = global_locations[i];
 				var marker = placeSavedMarker(loc);
-				savedMarkers.push(marker);			
+				var savedMarker = {marker: marker, index: loc.locationindex};
+				savedMarkers.push(savedMarker);			
 			}
 		} // --- updateMarkers
 		
@@ -407,10 +426,25 @@
 					// Remove temporary red marker
 					clickMarker.setMap(null);
 					
-					// Place new marker
+					/// TEST
+					$.ajax({
+						type: "GET",
+						url: '/google.search',
+						data: {'text': locName}
+					}).done(function(data){
+						if(data.status == 'OK') {
+							var results = data.record.content;
+					
+						}
+					});
+					
+					/// TEST
+					
+					// Place new marker and save it in the array
 					var newLocation = data.record.location;
 					var marker = placeSavedMarker(newLocation);
-					savedMarkers.push(marker);
+					var savedMarker = {marker: marker, index: newLocation.locationindex};
+					savedMarkers.push(savedMarker);
 								
 					// Automatically focus on the marker
 					google.maps.event.trigger(marker, 'click', {
