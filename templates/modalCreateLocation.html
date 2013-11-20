@@ -36,14 +36,16 @@
 		      
 		      <div id="wikiLayout" style="display: none"><!-- WikiLayout -->
 		      	<label>Please choose the appropriate Wikipedia link to complete information about your location:</label>
-		      	<span id="wikiList"></span>
-				<div class="radio">
-				  <label>
-				    <input type="radio" name="optionsRadios" id="options">
-				    Use my own Wikipedia link
-				  </label>
-				</div>				
-				<input class="form-control" type="text" placeholder="My Wikipedia link" disabled/>
+		      	<form id="wikiLinksForm">
+		      		<span id="wikiList"></span>
+					<div class="radio">
+					  <label>
+					    <input type="radio" name="optionsWikiLink" id="customLinkOption" value="custom_link"/>
+					    Use my own Wikipedia link
+					  </label>
+					</div>				
+					<input id="customLinkInput" class="form-control" type="text" placeholder="My Wikipedia link" disabled/>
+		      	</form>
 		      </div><!-- //WikiLayout -->
 	      </div><!-- //Modal body -->
 	      <div class="modal-footer">

@@ -61,7 +61,7 @@
 				<!-- Wikipedia description -->
 				<p><img src="/img/wiki.png" alt="Wiki">
 				<em><small>
-					<span id="wikipedia_desc">Jagalchi Fish Market is a fish market in the neighborhood of Nampo-dong in Jung-gu</span>
+					<span id="wikipedia_desc"></span>
 				</small></em></p>
 				
 				<!-- Upload pictures -->
@@ -125,7 +125,7 @@
     			$('#picturesUpload').append('<div class="form-group"><label for="inputFile" class="col-lg-2 control-label"></label><div class="col-lg-10"><input type="file" id="inputFile"><p class="help-block"></p></div></div>');
     		});
 
-			// Edit story
+			// --- Edit story --- //
 			$('#buttonEditStory').click(function() {
 				var datefrom = $('#dateFrom').val();
 				var dateto = $('#dateTo').val();
@@ -176,7 +176,7 @@
 				});
 			});
 
-			// Edit location
+			// --- Edit location --- //
 			$('#buttonEditLocation').click(function() {
 				var locName = $('#locName').html();
 				var locDesc = $('#locDesc').html();
@@ -216,7 +216,6 @@
 				}
 			});
 			
-			// Delete location
 			$('#buttonDeleteLocation').click(function() {
 				$('#modalDeleteLocation').modal('show');
 			});
@@ -369,6 +368,7 @@
 						$('#locIndex').val(m.locationindex);
    				    	$('#locName').text(loc.name);
    				    	$('#locDesc').text(loc.desc);
+   				    	//$('#wikipedia_desc').text(loc.?);
    				    	
    				    	// Display infos and hide default message
    				    	$('#noSelection').css("display","none");
@@ -413,87 +413,135 @@
   			placeMarker(event.latLng);
 		});
 		
+		// --- Functions of the create location modal --- //
+		function setLocationLayout() {
+			$('#wikiLayout').css('display','none');
+			$('#locationLayout').css('display','inherit');
+			$('#addLocation').css('display','inline');
+			$('#addLocationFinal').css('display','none');
+			$('#modalCreateLocation').modal('hide');
+		}
+		
+		function setWikiLayout() {
+			$('#wikiLayout').css('display','inherit');
+			$('#locationLayout').css('display','none');
+			$('#addLocation').css('display','none');
+			$('#addLocationFinal').css('display','inline');
+		}
+		
+		$('#addLocationCancel').click(function() {
+			setLocationLayout();
+		});
+		
+		/*
+		$('#customLinkOption').change(function() {
+			// Enable/disable input
+			if($('#customLinkOption').is(':checked')) {
+				$('#customLinkInput').prop('disabled', false);
+			} else {
+				$('#customLinkInput').prop('disabled', true);
+			}
+		});
+		*/
+		
+		$("input[name='optionsWikiLink']:radio").change(function(e){
+			if($(this).val() == 'custom_link') {
+				$('#customLinkInput').prop('disabled', false);
+			} else {
+				$('#customLinkInput').prop('disabled', true);
+			}
+		});
+		
 		// --- Create a new location --- //
 		$('#addLocation').click(function() {
 			var locName = $('#locationInputName').val();
 			if(locName) {
-				data = {'name': $('#locationInputName').val(),
-						'desc': $('#locationInputDesc').val(),
-						'latitude': latestPosition.latitude,
-						'longitude': latestPosition.longitude
-						};
+				// Change the layout
+				setWikiLayout();
 				
+				// Get the Wiki links
 				$.ajax({
-	  				type: "POST",
-	  				url: '/story.addlocation/' + {{ story.id }},
-	  				data: data
+					type: "GET",
+					url: '/google.search',
+					data: {'text': locName}
 				}).done(function(data){
-					// Remove temporary red marker
-					clickMarker.setMap(null);
-					
-					/// TEST
-					// Change the layout
-					$('#wikiLayout').css('display','inherit');
-					$('#locationLayout').css('display','none');
-					$('#addLocation').css('display','none');
-					$('#addLocationCancel').css('display','none');
-					$('#addLocationFinal').css('display','inline');
-					
-					$.ajax({
-						type: "GET",
-						url: '/google.search',
-						data: {'text': locName}
-					}).done(function(data){
-						if(data.status == 'OK') {
-							var results = data.record.content;
-							
-							// Empty previous data
-							$('#wikiList').empty();
-							
-							// Create an option for each link
-							for(i = 0 ; i < results.length ; i++) {
-								var content = results[i];
-								var title = content.title;
-								var link = content.link;
-								var radioButton = '<div class="radio"><label><input type="radio" name="optionsRadios" value="'
-								+ link + '">'+ title + '</label></div>';
-								$('#wikiList').append(radioButton);	
-							}
-							
-							//TODO
-							/*
-							Select the first by default
-							enable/disable input
-							Display description
-							*/
+					if(data.status == 'OK') {
+						var results = data.record.content;
+						
+						// Empty previous data
+						$('#wikiList').empty();
+						
+						// Create an option for each link
+						for(i = 0 ; i < results.length ; i++) {
+							var content = results[i];
+							var title = content.title;
+							var mylink = content.link;
+							var radioButton = '<div class="radio"><label><input type="radio" name="optionsWikiLink" value="'
+							+ mylink + '"/>'+ title + '</label></div>';
+							$('#wikiList').append(radioButton);	
 						}
-					});
-					
-					/// TEST
-					
-					// Place new marker and save it in the array
-					var newLocation = data.record.location;
-					global_locations.push(newLocation);
-					var marker = placeSavedMarker(newLocation);
-								
-					// Automatically focus on the marker
-					google.maps.event.trigger(marker, 'click', {
-						latLng: new google.maps.LatLng(0, 0)
-					});
-				});			
+						
+						// Select the first by default
+						$('[name="optionsWikiLink"]').first().attr('checked', 'checked');
+					}
+				});
 			} else {
 				// TODO : error message in the modal
+				// location name mandatory
 			}
 		}); // End addLocationClick
 		
 		$('#addLocationFinal').click(function(){
-			// Rechange the layout before hiding modal
-			$('#wikiLayout').css('display','none');
-			$('#locationLayout').css('display','inherit');
-			$('#addLocation').css('display','inline');
-			$('#addLocationCancel').css('display','inline');
-			$('#addLocationFinal').css('display','none');
-			$('#modalCreateLocation').modal('hide');
+			// Get the link selected
+			var wikiLink;
+			if($('#customLinkOption').is(':checked')) {
+				// Use custom link
+				wikiLink = $('#customLinkInput').val();
+			} else {
+				wikiLink = $('input[name="optionsWikiLink"]:checked', '#wikiLinksForm').val();
+			}
+			
+			// Get the Wikipedia text
+			$.ajax({
+	  				type: "POST",
+	  				url: '/wikipedia.search/',
+	  				data: {'url': wikiLink}
+			}).done(function(data){
+				if(data.status == 'OK') {
+					// Rechange the layout before hiding modal
+					setLocationLayout();
+					$('#modalCreateLocation').modal('hide');
+					
+					var wikiText = data.record.wiki;
+					
+					// Create the location
+					data = {'name': $('#locationInputName').val(),
+						'desc': $('#locationInputDesc').val(),
+						'latitude': latestPosition.latitude,
+						'longitude': latestPosition.longitude,
+						'wikipedia': wikiText
+					};
+					
+					$.ajax({
+						type: "POST",
+						url: '/story.addlocation/' + {{ story.id }},
+						data: data
+					}).done(function(data){
+						// Remove temporary red marker
+						clickMarker.setMap(null);
+						
+						// Place new marker and save it in the array
+						var newLocation = data.record.location;
+						global_locations.push(newLocation);
+						var marker = placeSavedMarker(newLocation);
+									
+						// Automatically focus on the marker
+						google.maps.event.trigger(marker, 'click', {
+							latLng: new google.maps.LatLng(0, 0)
+						});
+					});
+				}
+			});
 		});
 	}
 
