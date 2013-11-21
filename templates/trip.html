@@ -442,7 +442,7 @@
 				
 				// Get the Wiki links
 				$.ajax({
-					type: "GET",
+					type: "POST",
 					url: '/google.search',
 					data: {'text': locName}
 				}).done(function(data){
