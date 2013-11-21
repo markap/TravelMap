@@ -433,25 +433,6 @@
 			setLocationLayout();
 		});
 		
-		/*
-		$('#customLinkOption').change(function() {
-			// Enable/disable input
-			if($('#customLinkOption').is(':checked')) {
-				$('#customLinkInput').prop('disabled', false);
-			} else {
-				$('#customLinkInput').prop('disabled', true);
-			}
-		});
-		*/
-		
-		$("input[name='optionsWikiLink']:radio").change(function(e){
-			if($(this).val() == 'custom_link') {
-				$('#customLinkInput').prop('disabled', false);
-			} else {
-				$('#customLinkInput').prop('disabled', true);
-			}
-		});
-		
 		// --- Create a new location --- //
 		$('#addLocation').click(function() {
 			var locName = $('#locationInputName').val();
@@ -483,6 +464,15 @@
 						
 						// Select the first by default
 						$('[name="optionsWikiLink"]').first().attr('checked', 'checked');
+						
+						// Enable/disable input
+						$("input[name='optionsWikiLink']:radio").change(function(e){
+							if($(this).val() == 'custom_link') {
+								$('#customLinkInput').prop('disabled', false);
+							} else {
+								$('#customLinkInput').prop('disabled', true);
+							}
+						});
 					}
 				});
 			} else {
