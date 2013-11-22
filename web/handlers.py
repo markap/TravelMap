@@ -15,12 +15,17 @@ from google.appengine.api import urlfetch
 from boilerplate import models
 from boilerplate.lib.basehandler import BaseHandler, JSONHandler
 from boilerplate.lib.decorators import user_required
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext import blobstore
 
+import urllib
 from datetime import datetime
 import json
 import wiki2plain, wikipedia
 
 from web import models as m, parser, wiki2plain
+from web import blobstore as blob
+
 
 
 
@@ -287,7 +292,65 @@ class TripHandler(BaseHandler):
         
         return self.render_template('trip.html', **params)
     
+    
+class StoryImageUploadHandler(JSONHandler): 
 
+    def post(self, storyid, locationid):
+        # @todo make it secure
+        data = self.request.POST['file']
+        
+        story = m.Story.get_by_id(int(storyid))
+                
+        if data.type.find('image') != -1:
+            key = blob.write_blob(data)
+            
+            for k, location in enumerate(story.locations):
+                if int(location['locationindex']) == int(locationid):
+                    story.locations[k].setdefault('images', []).append(key)
+                    break
+        
+            story.put()
+        
+            self.msg.add_record('story', parser.ndb_obj_parser(story, True))
+        
+        else:
+            self.msg.add_error('Fileupload not allowed')
+        
+        self.print_json()
+        
+
+class StoryImageDeleteHandler(JSONHandler):
+    
+    def post(self, storyid, locationid, blob_key):   
+        blob_key = str(urllib.unquote(blob_key))
+        story = m.Story.get_by_id(int(storyid))
+        
+        for k, location in enumerate(story.locations):
+            if int(location['locationindex']) == int(locationid):
+                if blob_key in location.images:
+                    del story.locations[k].images[blob_key]
+                    break
+        
+        story.put()
+        
+        self.msg.add_record('story', parser.ndb_obj_parser(story, True))       
+        self.print_json()
+        
+            
+        
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler, JSONHandler):
+    
+    def get(self, blob_key):
+        blob_key = str(urllib.unquote(blob_key))
+        if not blobstore.get(blob_key):
+            self.error(404)
+            return
+        
+        self.send_blob(blobstore.BlobInfo.get(blob_key), save_as=False)
+        
+        
+        
+        
 class SecureRequestHandler(BaseHandler):
     """
     Only accessible to users that are logged in

@@ -32,6 +32,7 @@ class Story(ndb.Model):
     longitude = ndb.FloatProperty()
     
     
+    
     def _get_story_document(self):
         """Creates a search.Document from an user."""
         
