@@ -33,18 +33,22 @@ class ExploreHandler(BaseHandler):
             "user_info": user_info
         }
         """
-        return self.render_template('explore.html')#, **params)
+        
+        params = {
+            "stories": parser.ndb_list_parser(m.Story.query(), True)
+        }
+        
+        print params
+        
+        return self.render_template('explore.html', **params)
 
 
 class SearchHandler(BaseHandler):
     
     def get(self, **kwargs):
-        params = {
-            "stories": [{"name" : "Busan"}, {"name" : "Daejeon"}, {"name" : "Jeju"}, {"name" : "Tokyo"}]
-        }
+               
         
-        
-        return self.render_template('search.html', **params)
+        return self.render_template('search.html')
 
 class StoryHandler(BaseHandler):
     
@@ -79,6 +83,7 @@ class StoryRegisterHandler(JSONHandler):
                      desc=self.request.get('desc'))
         
         storykey = story.put()
+        story.put_to_index()
         
         self.msg.add_record('storykey', storykey.id())
         self.print_json()
@@ -96,6 +101,7 @@ class StoryEditHandler(JSONHandler):
         story.datefrom = datetime.strptime(datefrom, '%d/%m/%Y')
         story.desc = self.request.get('desc')
         story.put()
+        story.put_to_index()
                
         self.print_json()        
     
@@ -105,6 +111,7 @@ class StoryDeleteHandler(JSONHandler):
     def post(self, storyid):  
         story = m.Story.get_by_id(int(storyid))
         story.key.delete()
+        story.delete_from_index()
         self.print_json()          
 
 
@@ -114,6 +121,7 @@ class StoryDetailHandler(JSONHandler):
         story = m.Story.get_by_id(int(storyid))
         self.msg.add_record('locations', story.locations)
         self.print_json()
+        
     
 class StoryAddLocationHandler(JSONHandler):
     
@@ -132,11 +140,15 @@ class StoryAddLocationHandler(JSONHandler):
             'name': self.request.get('name'),
             'desc': self.request.get('desc'),
             'latitude': float(self.request.get('latitude')),
-            'longitude': float(self.request.get('longitude'))
+            'longitude': float(self.request.get('longitude')),
+            'wikipedia': self.request.get('wikipedia')
         }
+        print '#########'
+        print location
         
         story.locations.append(location)
         story.put()
+        story.put_to_index()
         
         self.msg.add_record('location', location)
         self.print_json()
@@ -160,6 +172,7 @@ class StoryEditLocationHandler(JSONHandler):
         
 
         story.put()    
+        story.put_to_index()
         
         self.msg.add_record('location', target_location)
         self.print_json()
@@ -169,16 +182,19 @@ class StoryEditLocationHandler(JSONHandler):
 
 class GoogleSearchHandler(JSONHandler):
     def post(self):
-        text = self.request.get('location')
-        text = "busan"
+        text = self.request.get('text')
+        print "############"
+        print text
+        #text = 'jeju'
         
         url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyBVGHr3UpamcOQkLPP7guMalOZ0l2VZO6k&cx=006720223612486791407:aet3a3qxagc&q=%s" % text
         result = urlfetch.fetch(url)
         if result.status_code == 200:
             links = []
             j = json.loads(result.content)
-            print j['items']
-            self.response.out.write(type(j))
+            #self.response.out.write(j)
+            #print j['items']
+            #self.response.out.write(type(j))
             for content in j['items']:
                 
                 if ".jpg" not in content['link'].lower() or ".png" not in content['link'].lower():
@@ -189,15 +205,15 @@ class GoogleSearchHandler(JSONHandler):
             
         self.print_json()
         
-    def get(self):
-        self.post()
+
+
         
+    
         
 class WikipediaHandler(JSONHandler):
     def post(self):
         
         url = self.request.get('url')
-        url = "Busan"
         
         
         wiki = wikipedia.Wikipedia('en')
@@ -216,9 +232,6 @@ class WikipediaHandler(JSONHandler):
     
     
     
-    def get(self):
-        self.post()
-
 
 class StoryDeleteLocationHandler(JSONHandler):
     def post(self, storyid, locationindex):
@@ -237,7 +250,26 @@ class StoryDeleteLocationHandler(JSONHandler):
             story.longitude = loc['longitude']
 
         story.put()
+        story.put_to_index()
         self.print_json()
+        
+        
+class StorySearchHandler(JSONHandler):
+    def post(self):
+        text = "fish"
+        #text = self.request.get('text')
+        result = m.Story.search_index(text)
+
+        stories = [parser.ndb_obj_parser(m.Story.get_by_id(int(r.doc_id)), True) for r in result]
+        for r in result:
+            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            print r.expressions
+        self.msg.add_record("result", stories)
+        self.print_json()
+        
+    def get(self):
+        self.post()
+        
 class TripHandler(BaseHandler):
     
     #@user_required
@@ -248,8 +280,7 @@ class TripHandler(BaseHandler):
         }
         """
         
-        print ndb.Key('Story', int(storyid)).get()
-        print m.Story.get_by_id(int(storyid))
+
         params = {
             "story": parser.ndb_obj_parser(m.Story.get_by_id(int(storyid)))
         }

@@ -443,7 +443,7 @@
 				// Get the Wiki links
 				$.ajax({
 					type: "POST",
-					url: '/google.search',
+					url: '/google.search/',
 					data: {'text': locName}
 				}).done(function(data){
 					if(data.status == 'OK') {
