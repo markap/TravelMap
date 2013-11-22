@@ -261,8 +261,8 @@ class StoryDeleteLocationHandler(JSONHandler):
         
 class StorySearchHandler(JSONHandler):
     def post(self):
-        text = "fish"
-        #text = self.request.get('text')
+        
+        text = self.request.get('text')
         result = m.Story.search_index(text)
 
         stories = [parser.ndb_obj_parser(m.Story.get_by_id(int(r.doc_id)), True) for r in result]
