@@ -22,6 +22,11 @@ _routes = [
     RedirectRoute('/search/', handlers.SearchHandler, name='search', strict_slash=True),
     RedirectRoute('/google.search/', handlers.GoogleSearchHandler, name='googlesearch', strict_slash=True),
     RedirectRoute('/wikipedia.search/', handlers.WikipediaHandler, name='wikisearch', strict_slash=True),
+    RedirectRoute('/story.search/', handlers.StorySearchHandler, name='storysearch', strict_slash=True),
+    RedirectRoute('/story.image.upload/<storyid>/<locationkey>', handlers.StoryImageUploadHandler, name='storyimage', strict_slash=True),
+    RedirectRoute('/story.image.delete/<storyid>/<locationkey>/<blobkey>', handlers.StoryImageDeleteHandler, name='storyimagedelete', strict_slash=True),
+    RedirectRoute('/serve/<blobkey>', handlers.ServeHandler, name='serve', strict_slash=True),
+    
 ]
 
 def get_routes():

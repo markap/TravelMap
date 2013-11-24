@@ -15,12 +15,17 @@ from google.appengine.api import urlfetch
 from boilerplate import models
 from boilerplate.lib.basehandler import BaseHandler, JSONHandler
 from boilerplate.lib.decorators import user_required
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext import blobstore
 
+import urllib
 from datetime import datetime
 import json
 import wiki2plain, wikipedia
 
 from web import models as m, parser, wiki2plain
+from web import blobstore as blob
+
 
 
 
@@ -33,18 +38,22 @@ class ExploreHandler(BaseHandler):
             "user_info": user_info
         }
         """
-        return self.render_template('explore.html')#, **params)
+        
+        params = {
+            "stories": parser.ndb_list_parser(m.Story.query(), True)
+        }
+        
+        print params
+        
+        return self.render_template('explore.html', **params)
 
 
 class SearchHandler(BaseHandler):
     
     def get(self, **kwargs):
-        params = {
-            "stories": [{"name" : "Busan"}, {"name" : "Daejeon"}, {"name" : "Jeju"}, {"name" : "Tokyo"}]
-        }
+               
         
-        
-        return self.render_template('search.html', **params)
+        return self.render_template('search.html')
 
 class StoryHandler(BaseHandler):
     
@@ -79,6 +88,7 @@ class StoryRegisterHandler(JSONHandler):
                      desc=self.request.get('desc'))
         
         storykey = story.put()
+        story.put_to_index()
         
         self.msg.add_record('storykey', storykey.id())
         self.print_json()
@@ -96,6 +106,7 @@ class StoryEditHandler(JSONHandler):
         story.datefrom = datetime.strptime(datefrom, '%d/%m/%Y')
         story.desc = self.request.get('desc')
         story.put()
+        story.put_to_index()
                
         self.print_json()        
     
@@ -105,6 +116,7 @@ class StoryDeleteHandler(JSONHandler):
     def post(self, storyid):  
         story = m.Story.get_by_id(int(storyid))
         story.key.delete()
+        story.delete_from_index()
         self.print_json()          
 
 
@@ -114,6 +126,7 @@ class StoryDetailHandler(JSONHandler):
         story = m.Story.get_by_id(int(storyid))
         self.msg.add_record('locations', story.locations)
         self.print_json()
+        
     
 class StoryAddLocationHandler(JSONHandler):
     
@@ -132,11 +145,15 @@ class StoryAddLocationHandler(JSONHandler):
             'name': self.request.get('name'),
             'desc': self.request.get('desc'),
             'latitude': float(self.request.get('latitude')),
-            'longitude': float(self.request.get('longitude'))
+            'longitude': float(self.request.get('longitude')),
+            'wikipedia': self.request.get('wikipedia')
         }
+        print '#########'
+        print location
         
         story.locations.append(location)
         story.put()
+        story.put_to_index()
         
         self.msg.add_record('location', location)
         self.print_json()
@@ -160,6 +177,7 @@ class StoryEditLocationHandler(JSONHandler):
         
 
         story.put()    
+        story.put_to_index()
         
         self.msg.add_record('location', target_location)
         self.print_json()
@@ -169,16 +187,19 @@ class StoryEditLocationHandler(JSONHandler):
 
 class GoogleSearchHandler(JSONHandler):
     def post(self):
-        text = self.request.get('location')
-        text = "busan"
+        text = self.request.get('text')
+        print "############"
+        print text
+        #text = 'jeju'
         
         url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyBVGHr3UpamcOQkLPP7guMalOZ0l2VZO6k&cx=006720223612486791407:aet3a3qxagc&q=%s" % text
         result = urlfetch.fetch(url)
         if result.status_code == 200:
             links = []
             j = json.loads(result.content)
-            print j['items']
-            self.response.out.write(type(j))
+            #self.response.out.write(j)
+            #print j['items']
+            #self.response.out.write(type(j))
             for content in j['items']:
                 
                 if ".jpg" not in content['link'].lower() or ".png" not in content['link'].lower():
@@ -189,15 +210,15 @@ class GoogleSearchHandler(JSONHandler):
             
         self.print_json()
         
-    def get(self):
-        self.post()
+
+
         
+    
         
 class WikipediaHandler(JSONHandler):
     def post(self):
         
         url = self.request.get('url')
-        url = "Busan"
         
         
         wiki = wikipedia.Wikipedia('en')
@@ -216,9 +237,6 @@ class WikipediaHandler(JSONHandler):
     
     
     
-    def get(self):
-        self.post()
-
 
 class StoryDeleteLocationHandler(JSONHandler):
     def post(self, storyid, locationindex):
@@ -237,7 +255,26 @@ class StoryDeleteLocationHandler(JSONHandler):
             story.longitude = loc['longitude']
 
         story.put()
+        story.put_to_index()
         self.print_json()
+        
+        
+class StorySearchHandler(JSONHandler):
+    def post(self):
+        
+        text = self.request.get('text')
+        result = m.Story.search_index(text)
+
+        stories = [parser.ndb_obj_parser(m.Story.get_by_id(int(r.doc_id)), True) for r in result]
+        for r in result:
+            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            print r.expressions
+        self.msg.add_record("result", stories)
+        self.print_json()
+        
+    def get(self):
+        self.post()
+        
 class TripHandler(BaseHandler):
     
     #@user_required
@@ -248,15 +285,72 @@ class TripHandler(BaseHandler):
         }
         """
         
-        print ndb.Key('Story', int(storyid)).get()
-        print m.Story.get_by_id(int(storyid))
+
         params = {
             "story": parser.ndb_obj_parser(m.Story.get_by_id(int(storyid)))
         }
         
         return self.render_template('trip.html', **params)
     
+    
+class StoryImageUploadHandler(JSONHandler): 
 
+    def post(self, storyid, locationid):
+        # @todo make it secure
+        data = self.request.POST['file']
+        
+        story = m.Story.get_by_id(int(storyid))
+                
+        if data.type.find('image') != -1:
+            key = blob.write_blob(data)
+            
+            for k, location in enumerate(story.locations):
+                if int(location['locationindex']) == int(locationid):
+                    story.locations[k].setdefault('images', []).append(key)
+                    break
+        
+            story.put()
+        
+            self.msg.add_record('story', parser.ndb_obj_parser(story, True))
+        
+        else:
+            self.msg.add_error('Fileupload not allowed')
+        
+        self.print_json()
+        
+
+class StoryImageDeleteHandler(JSONHandler):
+    
+    def post(self, storyid, locationid, blob_key):   
+        blob_key = str(urllib.unquote(blob_key))
+        story = m.Story.get_by_id(int(storyid))
+        
+        for k, location in enumerate(story.locations):
+            if int(location['locationindex']) == int(locationid):
+                if blob_key in location.images:
+                    del story.locations[k].images[blob_key]
+                    break
+        
+        story.put()
+        
+        self.msg.add_record('story', parser.ndb_obj_parser(story, True))       
+        self.print_json()
+        
+            
+        
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler, JSONHandler):
+    
+    def get(self, blob_key):
+        blob_key = str(urllib.unquote(blob_key))
+        if not blobstore.get(blob_key):
+            self.error(404)
+            return
+        
+        self.send_blob(blobstore.BlobInfo.get(blob_key), save_as=False)
+        
+        
+        
+        
 class SecureRequestHandler(BaseHandler):
     """
     Only accessible to users that are logged in

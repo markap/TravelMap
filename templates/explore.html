@@ -30,11 +30,16 @@
   			/**
   			 * Add some random locations
   			 */
-  			 var sample_locations = [[40.714353, -74.005973, "New York"], [-33.924869, 18.424055, "Cape town"],
+  			 var sample_locations = [];
+  			 {% for story in stories %}
+  			 	sample_locations.push([[{{ story.latitude }}], [{{ story.longitude }}], ["{{ story.name }}"]]);
+  			 {% endfor %}
+  			 alert(sample_locations.length);
+  			 /**var sample_locations = [[40.714353, -74.005973, "New York"], [-33.924869, 18.424055, "Cape town"],
   			 						 [37.566535, 126.977969, "Seoul"], [35.689487, 139.691706, "Tokyo"], 
   			 						 [39.904030,116.407526, "Beijing"],
   			 						 [14.599512, 120.984219, "Manila"], [-23.548943, -46.638818, "Sao Paulo"], 
-  			 						 [35.179554, 129.075642, "Busan"], [27.174526,78.042153, "Taj Mahal"]];
+  			 						 [35.179554, 129.075642, "Busan"], [27.174526,78.042153, "Taj Mahal"]];*/
   			 var sample_markers = [];
   			 var sample_infowindows = [];
   			 
