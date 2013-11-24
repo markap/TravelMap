@@ -32,7 +32,9 @@
   			 */
   			 var sample_locations = [];
   			 {% for story in stories %}
-  			 	sample_locations.push([[{{ story.latitude }}], [{{ story.longitude }}], ["{{ story.name }}"]]);
+				{%- if story.latitude -%}
+	  			 	sample_locations.push([[{{ story.latitude }}], [{{ story.longitude }}], ["{{ story.name }}"], ["{{ story.id }}"]]);
+				{% endif %}
   			 {% endfor %}
   			 alert(sample_locations.length);
   			 /**var sample_locations = [[40.714353, -74.005973, "New York"], [-33.924869, 18.424055, "Cape town"],
@@ -43,13 +45,13 @@
   			 var sample_markers = [];
   			 var sample_infowindows = [];
   			 
-  			 for (var i = 0; i < 9; i++) {
+  			 for (var i = 0; i < sample_locations.length; i++) {
   			 	console.log(i);
   			 	var marker = new google.maps.Marker({
         			map: map,
         			position: new google.maps.LatLng(sample_locations[i][0], sample_locations[i][1]),
         			info: new google.maps.InfoWindow({
-  							content: '<b>' + sample_locations[i][2] + '</b><br /><br /><button type="button" class="btn btn-primary">Explore</button>'
+  							content: '<b>' + sample_locations[i][2] + '</b><br/><a href="/trip/' + sample_locations[i][3] + '" class="btn btn-primary btn-xs">Explore</a>'
 					})
       			});
       			
