@@ -368,7 +368,7 @@
 						$('#locIndex').val(m.locationindex);
    				    	$('#locName').text(loc.name);
    				    	$('#locDesc').text(loc.desc);
-   				    	//$('#wikipedia_desc').text(loc.?);
+   				    	$('#wikipedia_desc').text(loc.wikipedia);
    				    	
    				    	// Display infos and hide default message
    				    	$('#noSelection').css("display","none");
@@ -423,6 +423,9 @@
 		}
 		
 		function setWikiLayout() {
+			$('#wikiList').empty(); // Empty previous data
+			$('#wikiList').html('<p><i class="fa fa-spinner fa-spin fa-2x"></i>&nbsp;Charging Wikipedia content</p>');
+			
 			$('#wikiLayout').css('display','inherit');
 			$('#locationLayout').css('display','none');
 			$('#addLocation').css('display','none');
@@ -430,6 +433,7 @@
 		}
 		
 		$('#addLocationCancel').click(function() {
+			//$('#wikiList').empty(); // Empty previous data
 			setLocationLayout();
 		});
 		
@@ -449,17 +453,22 @@
 					if(data.status == 'OK') {
 						var results = data.record.content;
 						
-						// Empty previous data
+						// Remove charging spinner
 						$('#wikiList').empty();
 						
-						// Create an option for each link
-						for(i = 0 ; i < results.length ; i++) {
-							var content = results[i];
-							var title = content.title;
-							var mylink = content.link;
-							var radioButton = '<div class="radio"><label><input type="radio" name="optionsWikiLink" value="'
-							+ mylink + '"/>'+ title + '</label></div>';
-							$('#wikiList').append(radioButton);	
+						if(results) {
+							// Create an option for each link
+							for(i = 0 ; i < results.length ; i++) {
+								var content = results[i];
+								var title = content.title;
+								var mylink = content.link;
+								var radioButton = '<div class="radio"><label><input type="radio" name="optionsWikiLink" value="'
+								+ mylink + '"/>'+ title + '</label></div>';
+								$('#wikiList').append(radioButton);
+							}
+						} else {
+							// No result found
+							$('#wikiList').html("<i class='fa fa-meh-o'></i>&nbsp;No Wikipedia result was found for your location. Please provide your own link.");
 						}
 						
 						// Select the first by default
@@ -488,7 +497,6 @@
 				// Use custom link
 				var url = $('#customLinkInput').val().split("/");
 				wikiLink = url[url.length-1];
-				alert(wikiLink);
 			} else {
 				wikiLink = $('input[name="optionsWikiLink"]:checked', '#wikiLinksForm').val();
 			}
@@ -500,7 +508,6 @@
 	  				data: {'url': wikiLink}
 			}).done(function(data){
 				if(data.status == 'OK') {
-					// Rechange the layout before hiding modal
 					setLocationLayout();
 					$('#modalCreateLocation').modal('hide');
 					
