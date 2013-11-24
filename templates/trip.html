@@ -486,7 +486,9 @@
 			var wikiLink;
 			if($('#customLinkOption').is(':checked')) {
 				// Use custom link
-				wikiLink = $('#customLinkInput').val();
+				var url = $('#customLinkInput').val().split("/");
+				wikiLink = url[url.length-1];
+				alert(wikiLink);
 			} else {
 				wikiLink = $('input[name="optionsWikiLink"]:checked', '#wikiLinksForm').val();
 			}
