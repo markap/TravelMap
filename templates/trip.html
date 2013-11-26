@@ -104,12 +104,37 @@
     <!-- Modal to edit the story -->
     {% include "modalEditStory.html" %}
     
+    <!-- Modal to upload picture -->
+    {% include "modalPictureUpload.html" %}
+    
 {% endblock %}
 
 {% block mediaJS %}
     
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
     <script>
+		// Upload pics
+		$('#buttonUploadPictures').click(function() {
+			$('#modalPictureUpload').modal('show');
+		});
+
+		$('#uploadPicture').click(function() {
+			var storyId = $('#storyId').val();
+			var locationId = $('#locIndex').val();
+			var imagePath = $('#inputFile').val();
+			
+			$.ajax({
+				type: "POST",
+				url: '/story.image.upload/' + storyId + '/' + locationId + '/',
+				data: {'file' : imagePath}
+			})
+			.done(function(data){
+				if(data.status == "OK") {
+					$('#modalPictureUpload').modal('hide');
+				}
+			});
+		});
+    
     	// Open modal to create a new location
 		function openModal() {
 			$('#modalCreateLocation').modal({ backdrop: 'static', keyboard: false });
@@ -120,11 +145,6 @@
 		}
     
 		function initialize() {
-			// Add new pictures
-    		$('#buttonMore').click(function(){
-    			$('#picturesUpload').append('<div class="form-group"><label for="inputFile" class="col-lg-2 control-label"></label><div class="col-lg-10"><input type="file" id="inputFile"><p class="help-block"></p></div></div>');
-    		});
-
 			// --- Edit story --- //
 			$('#buttonEditStory').click(function() {
 				var datefrom = $('#dateFrom').val();
@@ -424,7 +444,7 @@
 		
 		function setWikiLayout() {
 			$('#wikiList').empty(); // Empty previous data
-			$('#wikiList').html('<p><i class="fa fa-spinner fa-spin fa-2x"></i>&nbsp;Charging Wikipedia content</p>');
+			$('#wikiList').html('<p><i class="fa fa-spinner fa-spin fa-2x"></i>&nbsp;Loading Wikipedia content</p>');
 			
 			$('#wikiLayout').css('display','inherit');
 			$('#locationLayout').css('display','none');
