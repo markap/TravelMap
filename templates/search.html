@@ -5,27 +5,49 @@
 {% endblock %}
 
 {% block content %}
+	<div class="form-group">
+		<input type="text" id="searchTextInput" class="form-control" placeholder="Location, ...">
+	</div>
 
-
-	<form class="form-inline" role="form">
-  		<div class="form-group">
-    		<input type="email" class="form-control" id="exampleInputEmail2" placeholder="Location, ...">
-  		</div>
-  
-  		<button type="submit" class="btn btn-default">Search</button>
-	</form>
-	<br /><br />
+	<button id="buttonSearch" class="btn btn-default">Search</button>
+	<br/><br/>
+	
     <!-- List of the stories -->
     <table class="table table-hover">
-	    <tbody>
-			{% for story in stories %}
-			    <tr>
-			  		<td>{{ story.name }}</td>
-			  		<td>
-			  			<button type="button" class="btn btn-primary">View story</button>
-			  		</td>
-			  	</tr>
-			{% endfor %}
+	    <tbody id="results_display">
     	</tbody>
     </table>
+{% endblock %}
+
+{% block mediaJS %}
+	<script>
+		$('document').ready(function(){
+			$('#buttonSearch').click(function() {
+				var textSearch = $('searchTextInput').val();
+				$.ajax({
+					type: "POST",
+					url: '/story.search/',
+					data: {'text' : textSearch}
+				})
+				.done(function(data){
+					if(data.status == "OK") {
+						var results = data.record.result;
+						if( results ) {
+							$('#results_display').empty();
+							for(i = 0 ; i < results.length ; i++) {
+								$('#results_display').append('<tr class="story"><td><span class="display_story_name">'+results[i].name+'</span></td><td><a href="/trip/'+results[i].id+'" class="btn btn-default btn-small"><span class="glyphicon glyphicon-map-marker"></span> View story</a></td></tr>');
+								/*
+								$('#results_display').append('<tr class="story">');
+								$('#results_display').append('<td><span class="display_story_name">'+results[i].name+'</span></td>');
+								$('#results_display').append('<td><a href="/trip/'+results[i].id+'" class="btn btn-default btn-small">');
+								$('#results_display').append('<span class="glyphicon glyphicon-map-marker"></span> View story</a></td>');
+								$('#results_display').append('</tr>');
+								*/
+							}
+						}
+					}
+				});
+			});
+		});
+	</script>
 {% endblock %}
