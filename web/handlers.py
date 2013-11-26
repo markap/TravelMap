@@ -266,14 +266,15 @@ class StorySearchHandler(JSONHandler):
         result = m.Story.search_index(text)
 
         stories = [parser.ndb_obj_parser(m.Story.get_by_id(int(r.doc_id)), True) for r in result]
-        for r in result:
-            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-            print r.expressions
+
+
         self.msg.add_record("result", stories)
         self.print_json()
         
     def get(self):
         self.post()
+
+            
         
 class TripHandler(BaseHandler):
     
@@ -298,6 +299,8 @@ class StoryImageUploadHandler(JSONHandler):
     def post(self, storyid, locationid):
         # @todo make it secure
         data = self.request.POST['file']
+        print "######################################"
+        print data
         
         story = m.Story.get_by_id(int(storyid))
                 

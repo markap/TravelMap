@@ -125,7 +125,7 @@
 			
 			$.ajax({
 				type: "POST",
-				url: '/story.image.upload/' + storyId + '/' + locationId + '/',
+				url: '/story.image.upload/' + storyId + '/' + locationId,
 				data: {'file' : imagePath}
 			})
 			.done(function(data){
