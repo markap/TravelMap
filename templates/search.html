@@ -23,7 +23,7 @@
 	<script>
 		$('document').ready(function(){
 			$('#buttonSearch').click(function() {
-				var textSearch = $('searchTextInput').val();
+				var textSearch = $('#searchTextInput').val();
 				$.ajax({
 					type: "POST",
 					url: '/story.search/',
