@@ -314,7 +314,7 @@ class StoryImageUploadHandler(JSONHandler):
         
             story.put()
         
-            self.msg.add_record('story', parser.ndb_obj_parser(story, True))
+            self.msg.add_record('locations', story.locations)
         
         else:
             self.msg.add_error('Fileupload not allowed')
@@ -324,8 +324,8 @@ class StoryImageUploadHandler(JSONHandler):
 
 class StoryImageDeleteHandler(JSONHandler):
     
-    def post(self, storyid, locationid, blob_key):   
-        blob_key = str(urllib.unquote(blob_key))
+    def post(self, storyid, locationid, blobkey):   
+        blob_key = str(urllib.unquote(blobkey))
         story = m.Story.get_by_id(int(storyid))
         
         for k, location in enumerate(story.locations):
@@ -336,15 +336,15 @@ class StoryImageDeleteHandler(JSONHandler):
         
         story.put()
         
-        self.msg.add_record('story', parser.ndb_obj_parser(story, True))       
+        self.msg.add_record('locations', story.locations)       
         self.print_json()
         
             
         
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler, JSONHandler):
     
-    def get(self, blob_key):
-        blob_key = str(urllib.unquote(blob_key))
+    def get(self, blobkey):
+        blob_key = str(urllib.unquote(blobkey))
         if not blobstore.get(blob_key):
             self.error(404)
             return
