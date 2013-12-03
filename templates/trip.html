@@ -118,9 +118,40 @@
 			$('#modalPictureUpload').modal('show');
 		});
 
-		$('#uploadPicture').click(function() {
+		// TEST 
+		$("#form_upload").submit(function(event) {
+			event.preventDefault();
+
 			var storyId = $('#storyId').val();
 			var locationId = $('#locIndex').val();
+			
+			var formData = new FormData(this);
+
+			$.ajax({
+			  url: '/story.image.upload/' + storyId + '/' + locationId,
+			  data: formData,
+			  processData: false,
+			  contentType: false,
+			  type: 'POST',
+			  success: function(data) {
+					if( data.status == "OK" ) {
+						
+					} else {
+						
+					}
+				}
+			});
+		});
+		
+		// FIN TEST
+
+		/*
+		$('#uploadPicture').click(function() {
+			
+			var storyId = $('#storyId').val();
+			var locationId = $('#locIndex').val();
+			
+			
 			var imagePath = $('#inputFile').val();
 			
 			$.ajax({
@@ -133,7 +164,10 @@
 					$('#modalPictureUpload').modal('hide');
 				}
 			});
+			
+			
 		});
+		*/
     
     	// Open modal to create a new location
 		function openModal() {
