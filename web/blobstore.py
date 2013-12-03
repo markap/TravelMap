@@ -12,4 +12,4 @@ def write_blob(upload_file):
     files.finalize(file_name)
 
     # Get the file's blob key
-    return files.blobstore.get_blob_key(file_name)
+    return str(files.blobstore.get_blob_key(file_name))
