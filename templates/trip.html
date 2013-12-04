@@ -116,58 +116,8 @@
 		// Upload pics
 		$('#buttonUploadPictures').click(function() {
 			$('#modalPictureUpload').modal('show');
+			$('#file').val('');
 		});
-
-		// TEST 
-		$("#form_upload").submit(function(event) {
-			event.preventDefault();
-
-			var storyId = $('#storyId').val();
-			var locationId = $('#locIndex').val();
-			
-			var formData = new FormData(this);
-
-			$.ajax({
-			  url: '/story.image.upload/' + storyId + '/' + locationId,
-			  data: formData,
-			  processData: false,
-			  contentType: false,
-			  type: 'POST',
-			  success: function(data) {
-					if( data.status == "OK" ) {
-						
-					} else {
-						
-					}
-				}
-			});
-		});
-		
-		// FIN TEST
-
-		/*
-		$('#uploadPicture').click(function() {
-			
-			var storyId = $('#storyId').val();
-			var locationId = $('#locIndex').val();
-			
-			
-			var imagePath = $('#inputFile').val();
-			
-			$.ajax({
-				type: "POST",
-				url: '/story.image.upload/' + storyId + '/' + locationId,
-				data: {'file' : imagePath}
-			})
-			.done(function(data){
-				if(data.status == "OK") {
-					$('#modalPictureUpload').modal('hide');
-				}
-			});
-			
-			
-		});
-		*/
     
     	// Open modal to create a new location
 		function openModal() {
@@ -402,6 +352,37 @@
 			} 
 		}
 		
+		// IMAGE UPLOAD
+		$("#form_upload").submit(function(event) {
+			event.preventDefault();
+
+			var storyId = $('#storyId').val();
+			var locationId = $('#locIndex').val();
+			
+			var formData = new FormData(this);
+			$('#uploading').css('display','inline');
+
+			$.ajax({
+			  url: '/story.image.upload/' + storyId + '/' + locationId,
+			  data: formData,
+			  processData: false,
+			  contentType: false,
+			  type: 'POST',
+			  success: function(data) {
+					if( data.status == "OK" ) {
+						// Updated data
+						var locations = data.record.locations;
+						global_locations = locations;
+						$("#modalPictureUpload").modal("hide");
+					} else {
+						
+					}
+					$('#uploading').css('display','none');
+				}
+			});
+		});
+		// END IMAGE UPLOAD
+		
 		// Function to place a green saved marker on the map
 		function placeSavedMarker(loc) {
 			var marker = new google.maps.Marker({
@@ -416,7 +397,8 @@
       		
    			google.maps.event.addListener(marker, 'click', (function(m) {
    				return function() {
-   				    // loc = get_location_for_index(m.locationindex);
+					var locIndex = loc.locationindex;
+   				    loc = get_location_for_index(locIndex);
    				    
    				    if (loc != null) {
 						$('#locIndex').val(m.locationindex);
@@ -427,6 +409,19 @@
    				    	// Display infos and hide default message
    				    	$('#noSelection').css("display","none");
    				    	$('#selectionInfos').css("display","inherit");
+   				    	
+   				    	// Display images
+   				    	$('#picturesDisplay').empty();
+   				    	var images = loc.images;
+   				    	var path = "/serve/";
+   				    	if(images) {
+							for(i=0 ; i<images.length ; i++) {
+								var image = '<div class="col-sm-6 col-md-3">'
+								+ '<a href="#" class="thumbnail">'
+								+ '<img src="'+ path + images[i] +'" alt="Sample 1"></a></div>';
+								$('#picturesDisplay').append(image);
+							}
+						}
    				    }
    				};
 			})(marker));
