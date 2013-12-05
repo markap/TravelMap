@@ -213,6 +213,9 @@
 							loc.name = name;
 							loc.desc = desc;
 							
+							// Better way to refresh but slower because of the images
+							//displayLocation(index);
+							
 							$('#locName').html(name);
 							$('#locDesc').html(desc);
 						}
@@ -352,36 +355,33 @@
 			} 
 		}
 		
-		// IMAGE UPLOAD
-		$("#form_upload").submit(function(event) {
-			event.preventDefault();
-
-			var storyId = $('#storyId').val();
-			var locationId = $('#locIndex').val();
-			
-			var formData = new FormData(this);
-			$('#uploading').css('display','inline');
-
-			$.ajax({
-			  url: '/story.image.upload/' + storyId + '/' + locationId,
-			  data: formData,
-			  processData: false,
-			  contentType: false,
-			  type: 'POST',
-			  success: function(data) {
-					if( data.status == "OK" ) {
-						// Updated data
-						var locations = data.record.locations;
-						global_locations = locations;
-						$("#modalPictureUpload").modal("hide");
-					} else {
-						
+		// Function to display infos of the specified location
+		function displayLocation(locationIndex) {			
+			var loc = get_location_for_index(locationIndex);			
+			if (loc != null) {
+				$('#locIndex').val(loc.locationindex);
+				$('#locName').text(loc.name);
+				$('#locDesc').text(loc.desc);
+				$('#wikipedia_desc').text(loc.wikipedia);
+				
+				// Display infos and hide default message
+				$('#noSelection').css("display","none");
+				$('#selectionInfos').css("display","inherit");
+				
+				// Display images
+				$('#picturesDisplay').empty();
+				var images = loc.images;
+				var path = "/serve/";
+				if(images) {
+					for(i=0 ; i<images.length ; i++) {
+						var image = '<div class="col-sm-6 col-md-3">'
+						+ '<a href="#" class="thumbnail">'
+						+ '<img src="'+ path + images[i] +'" alt="Sample 1"></a></div>';
+						$('#picturesDisplay').append(image);
 					}
-					$('#uploading').css('display','none');
 				}
-			});
-		});
-		// END IMAGE UPLOAD
+			}
+		}
 		
 		// Function to place a green saved marker on the map
 		function placeSavedMarker(loc) {
@@ -397,32 +397,7 @@
       		
    			google.maps.event.addListener(marker, 'click', (function(m) {
    				return function() {
-					var locIndex = loc.locationindex;
-   				    loc = get_location_for_index(locIndex);
-   				    
-   				    if (loc != null) {
-						$('#locIndex').val(m.locationindex);
-   				    	$('#locName').text(loc.name);
-   				    	$('#locDesc').text(loc.desc);
-   				    	$('#wikipedia_desc').text(loc.wikipedia);
-   				    	
-   				    	// Display infos and hide default message
-   				    	$('#noSelection').css("display","none");
-   				    	$('#selectionInfos').css("display","inherit");
-   				    	
-   				    	// Display images
-   				    	$('#picturesDisplay').empty();
-   				    	var images = loc.images;
-   				    	var path = "/serve/";
-   				    	if(images) {
-							for(i=0 ; i<images.length ; i++) {
-								var image = '<div class="col-sm-6 col-md-3">'
-								+ '<a href="#" class="thumbnail">'
-								+ '<img src="'+ path + images[i] +'" alt="Sample 1"></a></div>';
-								$('#picturesDisplay').append(image);
-							}
-						}
-   				    }
+					displayLocation(loc.locationindex);
    				};
 			})(marker));
 			return marker;
@@ -591,6 +566,38 @@
 				}
 			});
 		});
+	
+		// IMAGE UPLOAD
+		$("#form_upload").submit(function(event) {
+			event.preventDefault();
+
+			var storyId = $('#storyId').val();
+			var locationId = $('#locIndex').val();
+			
+			var formData = new FormData(this);
+			$('#uploading').css('display','inline');
+
+			$.ajax({
+			  url: '/story.image.upload/' + storyId + '/' + locationId,
+			  data: formData,
+			  processData: false,
+			  contentType: false,
+			  type: 'POST',
+			  success: function(data) {
+					if( data.status == "OK" ) {
+						// Updated data
+						var locations = data.record.locations;
+						global_locations = locations;
+						displayLocation(locationId);
+						$("#modalPictureUpload").modal("hide");
+					} else {
+						
+					}
+					$('#uploading').css('display','none');
+				}
+			});
+		});
+		// END IMAGE UPLOAD
 	}
 
 	google.maps.event.addDomListener(window, 'load', initialize);
