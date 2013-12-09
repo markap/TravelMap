@@ -192,8 +192,9 @@ class GoogleSearchHandler(JSONHandler):
         print text
         #text = 'jeju'
         
-        url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyBVGHr3UpamcOQkLPP7guMalOZ0l2VZO6k&cx=006720223612486791407:aet3a3qxagc&q=%s" % text
+        url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyBVGHr3UpamcOQkLPP7guMalOZ0l2VZO6k&cx=006720223612486791407:aet3a3qxagc&q=%s" % urllib.quote_plus(text)
         result = urlfetch.fetch(url)
+        print result.content
         if result.status_code == 200:
             links = []
             j = json.loads(result.content)
