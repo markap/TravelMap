@@ -71,23 +71,24 @@
 				<br/><br/>
 				
 				<!-- Related pictures -->
-				<div id="picturesDisplay" class="row">
+				<div id="picturesDisplay" class="row"></div>
+				
+				<div>
 					<div class="col-sm-6 col-md-3">
+						<span class="glyphicon glyphicon-remove pull-right"></span>
 						<a href="#" class="thumbnail">
 							<img src="/img/sample1.jpg" alt="Sample 1">
+							
+							<!--
+							<div class="caption">
+								<span class="glyphicon glyphicon-remove"></span>
+							</div>
+							 -->
 						</a>
-					</div>
-					<div class="col-sm-6 col-md-3">
-						<a href="#" class="thumbnail">
-							<img src="/img/sample2.jpg" alt="Sample 2">
-						</a>
-					</div>
-					<div class="col-sm-6 col-md-3">
-						<a href="#" class="thumbnail">
-							<img src="/img/sample3.jpg" alt="Sample 3">
-						</a>
+						
 					</div>
 				</div>
+				
 			</div>
 		</div>
 	</div>
@@ -107,6 +108,9 @@
     <!-- Modal to upload picture -->
     {% include "modalPictureUpload.html" %}
     
+    <!-- Modal to display pictures -->
+    {% include "modalCarousel.html" %}
+    
 {% endblock %}
 
 {% block mediaJS %}
@@ -119,6 +123,36 @@
 			$('#file').val('');
 		});
     
+		// Display carousel with focus on the selected image
+    	function showCarousel(idImage) {
+			// Remove active item
+			$('.item-image').each(function(){
+				$(this).removeClass('active');
+			});
+					
+			$('#item-'+idImage).addClass('active');
+			$('#modalCarousel').modal('show');
+		}
+		
+		// Update images in the carousel
+		function updateCarousel(location) {
+			if(location) {
+				var images = location.images;
+				if(images) {
+					$('#carousel-inner').empty();
+					for(i=0 ; i<images.length ; i++) {
+						var div = '<div id="item-' + images[i] + '" class="item item-image">'
+						+ '<img alt="Sorry" src="/serve/' + images[i] + '">'
+						+ '</div>';
+						$('#carousel-inner').append(div);
+					}
+					$('.carousel').carousel({
+						interval: false
+					});
+				}
+			}
+		}
+    
     	// Open modal to create a new location
 		function openModal() {
 			$('#modalCreateLocation').modal({ backdrop: 'static', keyboard: false });
@@ -129,6 +163,14 @@
 		}
     
 		function initialize() {
+			// --- Initialize carousel --- //
+			//TODO
+			/*
+			$('.carousel').carousel({
+				interval: false
+			});
+			*/
+			
 			// --- Edit story --- //
 			$('#buttonEditStory').click(function() {
 				var datefrom = $('#dateFrom').val();
@@ -372,14 +414,19 @@
 				$('#picturesDisplay').empty();
 				var images = loc.images;
 				var path = "/serve/";
+				var modalCarousel = "#modalCarousel";
 				if(images) {
 					for(i=0 ; i<images.length ; i++) {
 						var image = '<div class="col-sm-6 col-md-3">'
-						+ '<a href="#" class="thumbnail">'
+						//+ '<a class="thumbnail" data-toggle="modal" data-target="' + modalCarousel + '">'
+						+ '<a class="thumbnail image" onClick="showCarousel(\'' + images[i] + '\');">' // changed
 						+ '<img src="'+ path + images[i] +'" alt="Sample 1"></a></div>';
 						$('#picturesDisplay').append(image);
 					}
 				}
+				
+				// Update carousel
+				updateCarousel(loc);
 			}
 		}
 		
@@ -457,7 +504,6 @@
 		}
 		
 		$('#addLocationCancel').click(function() {
-			//$('#wikiList').empty(); // Empty previous data
 			setLocationLayout();
 		});
 		
@@ -585,7 +631,7 @@
 			  type: 'POST',
 			  success: function(data) {
 					if( data.status == "OK" ) {
-						// Updated data
+						// Update data
 						var locations = data.record.locations;
 						global_locations = locations;
 						displayLocation(locationId);
