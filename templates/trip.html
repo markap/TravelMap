@@ -72,23 +72,6 @@
 				
 				<!-- Related pictures -->
 				<div id="picturesDisplay" class="row"></div>
-				
-				<div>
-					<div class="col-sm-6 col-md-3">
-						<span class="glyphicon glyphicon-remove pull-right"></span>
-						<a href="#" class="thumbnail">
-							<img src="/img/sample1.jpg" alt="Sample 1">
-							
-							<!--
-							<div class="caption">
-								<span class="glyphicon glyphicon-remove"></span>
-							</div>
-							 -->
-						</a>
-						
-					</div>
-				</div>
-				
 			</div>
 		</div>
 	</div>
@@ -147,7 +130,8 @@
 						$('#carousel-inner').append(div);
 					}
 					$('.carousel').carousel({
-						interval: false
+						interval: false,
+						cycle: true
 					});
 				}
 			}
@@ -170,6 +154,7 @@
 				interval: false
 			});
 			*/
+			
 			
 			// --- Edit story --- //
 			$('#buttonEditStory').click(function() {
@@ -644,6 +629,34 @@
 			});
 		});
 		// END IMAGE UPLOAD
+		
+		// Delete image
+		$('#deleteImage').click(function() {
+			var imageid = $('.item-image.active').attr('id').substring(5);
+			var storyid = $('#storyId').val();
+			var locationid = $('#locIndex').val();
+			$.ajax({
+				type: "POST",
+				url: '/story.image.delete/' + storyid + '/' + locationid + '/' + imageid
+			})
+			.done(function(data){
+				if(data.status == "OK") {
+					// Update data
+					var locations = data.record.locations;
+					global_locations = locations;
+					displayLocation(locationid);
+					
+					// If no more image, close the carousel
+					var currentLocation = get_location_for_index(locationid);
+					if(!currentLocation.images || currentLocation.images.length == 0) {
+						$('#modalCarousel').modal('hide');
+					} else {
+						$('#item-'+currentLocation.images[0]).addClass('active');
+						$('.carousel').carousel();
+					}
+				}
+			});
+		});
 	}
 
 	google.maps.event.addDomListener(window, 'load', initialize);

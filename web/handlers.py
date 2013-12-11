@@ -331,8 +331,8 @@ class StoryImageDeleteHandler(JSONHandler):
         
         for k, location in enumerate(story.locations):
             if int(location['locationindex']) == int(locationid):
-                if blob_key in location.images:
-                    del story.locations[k].images[blob_key]
+                if blob_key in location['images']:
+                    story.locations[k]['images'].remove(blob_key)
                     break
         
         story.put()
