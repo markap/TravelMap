@@ -24,7 +24,10 @@
 			<input type="hidden" id="storyDesc" value="{{ story.desc }}"/>
 		
 			<!-- Name of the trip -->
-			<h3 id="displayStoryName">{{ story.name }}</h3>
+			<h3>
+				<span class="glyphicon glyphicon-book"></span>
+				<span id="displayStoryName">{{ story.name }}</span>
+			</h3>
 			
 			<div class="btn-group">
 				<button id="buttonEditStory" type="button" class="btn btn-default btn-xs">
@@ -44,7 +47,10 @@
 			
 			<div id="selectionInfos" style="display: none;">
 				<input id="locIndex" type="hidden"/>
-				<h4 id="locName">Jagalchi Market</h4>
+				<h4>
+					<span class="glyphicon glyphicon-map-marker"></span>
+					<span id="locName">Jagalchi Market</span>
+				</h4>
 				<!-- Actions on location -->
 				<div class="btn-group">
 					<button id="buttonEditLocation" type="button" class="btn btn-default btn-xs">
@@ -148,13 +154,13 @@
     
 		function initialize() {
 			// --- Initialize carousel --- //
-			//TODO
-			/*
-			$('.carousel').carousel({
-				interval: false
+			$('.carousel-control.left').click(function() {
+			  $('#carousel').carousel('prev');
 			});
-			*/
-			
+
+			$('.carousel-control.right').click(function() {
+			  $('#carousel').carousel('next');
+			});
 			
 			// --- Edit story --- //
 			$('#buttonEditStory').click(function() {
