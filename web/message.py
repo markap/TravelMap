@@ -1,5 +1,10 @@
 import json
 
+
+"""
+    Message object for handling and printing json data
+    Allows to handle data records and errors
+"""
 class Message:
 
 

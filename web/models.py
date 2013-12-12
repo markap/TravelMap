@@ -4,6 +4,9 @@ from google.appengine.api import search
 _STORY_INDEX = 'STORY'
 
 
+"""
+    Tokenizer method for strings
+"""
 def tokenize(phrase):
     a = []
     for word in phrase.split():
@@ -19,6 +22,9 @@ def tokenize(phrase):
 
 
 
+"""
+    The story model
+"""
 class Story(ndb.Model):
     name = ndb.StringProperty(required=True)
     dateto = ndb.DateProperty()
@@ -51,14 +57,17 @@ class Story(ndb.Model):
     
     
     def delete_from_index(self):
+        """ deletes a story from the index """
         search.Index(name=_STORY_INDEX).delete(str(self.key.id())) 
 
     def put_to_index(self):
+        """ puts a story to the index """
         search.Index(name=_STORY_INDEX).put(self._get_story_document())
         
         
     @staticmethod
     def search_index(query_string):
+        """ search for all stories """
     
         query_string = " OR ".join(query_string.split())
     

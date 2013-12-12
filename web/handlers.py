@@ -28,17 +28,13 @@ from web import blobstore as blob
 
 
 
-
+"""
+    This handler gives an overview of all the stories created.
+    The data will be presented on a map template
+"""
 class ExploreHandler(BaseHandler):
-    
     def get(self, **kwargs):
-        """
-        user_info = models.User.get_by_id(long(self.user_id))
-        params = {
-            "user_info": user_info
-        }
-        """
-        
+    
         params = {
             "stories": parser.ndb_list_parser(m.Story.query(), True)
         }
@@ -48,24 +44,24 @@ class ExploreHandler(BaseHandler):
         return self.render_template('explore.html', **params)
 
 
+"""
+    Renders the search template
+    The actual search is executed via ajax call
+"""
 class SearchHandler(BaseHandler):
     
-    def get(self, **kwargs):
-               
-        
+    def get(self, **kwargs):        
         return self.render_template('search.html')
-
+    
+    
+"""
+    Loads all stories and renders it as a list
+"""
 class StoryHandler(BaseHandler):
     
     #@user_required
     def get(self, **kwargs):
-        """
-        user_info = models.User.get_by_id(long(self.user_id))
-        params = {
-            "user_info": user_info
-        }
-        """
-     
+        
         params = {
             "stories": parser.ndb_list_parser(m.Story.query())
         }
@@ -74,6 +70,12 @@ class StoryHandler(BaseHandler):
         return self.render_template('story.html', **params)
        
     
+    
+"""
+    Handler to create a new story
+    Only basis story data is required, 
+    like name, date and description
+"""
 class StoryRegisterHandler(JSONHandler):
     
     #@user_required
@@ -94,6 +96,9 @@ class StoryRegisterHandler(JSONHandler):
         self.print_json()
         
 
+"""
+    Handler to edit basis story data
+"""
 class StoryEditHandler(JSONHandler):
     
     def post(self, storyid):
@@ -110,7 +115,10 @@ class StoryEditHandler(JSONHandler):
                
         self.print_json()        
     
-    
+   
+"""
+    Handler for deleting a existing story completely
+""" 
 class StoryDeleteHandler(JSONHandler):
     
     def post(self, storyid):  
@@ -120,6 +128,10 @@ class StoryDeleteHandler(JSONHandler):
         self.print_json()          
 
 
+"""
+    Shows all the locations belonging to the story,
+    containing geocoordinates, name, wiki text, images etc.
+"""
 class StoryDetailHandler(JSONHandler):
     
     def post(self, storyid):
@@ -128,6 +140,12 @@ class StoryDetailHandler(JSONHandler):
         self.print_json()
         
     
+    
+"""
+    Handler to add a new location to an existing story
+    A new location contains geocoordinates, name, description
+    and wikipedia text
+"""
 class StoryAddLocationHandler(JSONHandler):
     
     #@user_required
@@ -159,6 +177,9 @@ class StoryAddLocationHandler(JSONHandler):
         self.print_json()
     
     
+"""
+    Handler for editing an existing location
+"""
 class StoryEditLocationHandler(JSONHandler):
     
     #@user_required
@@ -184,7 +205,10 @@ class StoryEditLocationHandler(JSONHandler):
         
     
      
-
+"""
+    Google search handler to find wikipedia related pages
+    We use google search because the wiki search engine is pretty bad
+"""
 class GoogleSearchHandler(JSONHandler):
     def post(self):
         text = self.request.get('text')
@@ -214,8 +238,9 @@ class GoogleSearchHandler(JSONHandler):
 
 
         
-    
-        
+"""
+    Handler for getting the first paragraph for a wikipedia url
+"""
 class WikipediaHandler(JSONHandler):
     def post(self):
         
@@ -238,7 +263,9 @@ class WikipediaHandler(JSONHandler):
     
     
     
-
+"""
+    Handler to delete the location of a story
+"""
 class StoryDeleteLocationHandler(JSONHandler):
     def post(self, storyid, locationindex):
         
@@ -260,6 +287,10 @@ class StoryDeleteLocationHandler(JSONHandler):
         self.print_json()
         
         
+
+""" 
+    Searches all the stories matching a given keyword
+"""
 class StorySearchHandler(JSONHandler):
     def post(self):
         
@@ -276,7 +307,10 @@ class StorySearchHandler(JSONHandler):
         self.post()
 
             
-        
+       
+"""
+    Loads basis story details for a story 
+""" 
 class TripHandler(BaseHandler):
     
     #@user_required
@@ -295,6 +329,11 @@ class TripHandler(BaseHandler):
         return self.render_template('trip.html', **params)
     
     
+    
+"""
+    Handler for uploading images 
+    Images belong to a specific location
+"""
 class StoryImageUploadHandler(JSONHandler): 
 
     def post(self, storyid, locationid):
@@ -323,6 +362,10 @@ class StoryImageUploadHandler(JSONHandler):
         self.print_json()
         
 
+
+"""
+    Handler to delete images
+"""
 class StoryImageDeleteHandler(JSONHandler):
     
     def post(self, storyid, locationid, blobkey):   
@@ -341,7 +384,10 @@ class StoryImageDeleteHandler(JSONHandler):
         self.print_json()
         
             
-        
+
+"""
+    Handler to load images from GAE blobstore
+"""
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler, JSONHandler):
     
     def get(self, blobkey):
@@ -354,7 +400,9 @@ class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler, JSONHandler):
         
         
         
-        
+"""
+    Just an example for later user handling
+"""
 class SecureRequestHandler(BaseHandler):
     """
     Only accessible to users that are logged in
