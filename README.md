@@ -1,4 +1,4 @@
-Tripstory
+Tripstory - A KAIST Webtech project
 
 Get started
 ------------------------------------
